@@ -1,5 +1,12 @@
 # Third Robot Driver
 
+## 準備
+`wstool`を使ったことがなかったら`ros`のワークスペースで以下のコマンドを実行する．
+```
+$ cd ~/catkin_ws/src
+$ wstool init .
+```
+
 ## ビルド方法
 ```
 $ cd ~/catkin_ws/src
