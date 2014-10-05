@@ -204,69 +204,7 @@ int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
 
-// *****************************************************************************
-// Set ROBOT stasis
-void cirkit::ThirdRobotInterface::setStasis(double speed)
-{
-  static int forward_stop_cnt = 0;
-  static int back_stop_cnt = 0;
-  static int last_run_mode = -1;
 
-  // cout << "f_cnt : " << forward_stop_cnt << endl;
-  // cout << "b_cnt : " << back_stop_cnt << endl; 
-  if(speed > 0.0){
-	if(runmode == FORWARD_MODE){
-	  stasis_ = ROBOT_STASIS_FORWARD;
-	}else if(runmode == FORWARD_STOP_MODE){
-	  stasis_ = ROBOT_STASIS_FORWARD_STOP;
-	}else{
-	  stasis_ = ROBOT_STASIS_OTHERWISE;
-	}
-	forward_stop_cnt = 0;
-	back_stop_cnt = 0;
-  }else if(speed < 0.0){
-	if(runmode == BACK_MODE){
-	  stasis_ = ROBOT_STASIS_BACK;
-	}else if( runmode == BACK_STOP_MODE){
-	  stasis_ = ROBOT_STASIS_BACK_STOP;
-	}else{
-	  stasis_ = ROBOT_STASIS_OTHERWISE;
-	} 
-	forward_stop_cnt = 0;
-	back_stop_cnt = 0;
-  }else{ // speed == 0.0
-	if(runmode == FORWARD_STOP_MODE){
-	  if(forward_stop_cnt >= 10){
-		stasis_ = ROBOT_STASIS_FORWARD_STOP;
-		forward_stop_cnt = 0;
-		back_stop_cnt = 0;		
-	  }else{
-		stasis_ = ROBOT_STASIS_OTHERWISE;
-		forward_stop_cnt++;
-		back_stop_cnt = 0;		
-	  }
-	}else if(runmode == BACK_STOP_MODE){
-	  if(back_stop_cnt >= 10){
-		stasis_ = ROBOT_STASIS_BACK_STOP;
-		back_stop_cnt = 0;
-		forward_stop_cnt = 0;
-	  }else{
-		stasis_ = ROBOT_STASIS_OTHERWISE;
-		back_stop_cnt++;
-		forward_stop_cnt = 0;
-	  }
-	}else if(runmode == FORWARD_MODE){
-	  stasis_ = ROBOT_STASIS_FORWARD_STOP;
-	  back_stop_cnt = 0;
-	  forward_stop_cnt = 0;
-	}else if(runmode == BACK_MODE){
-	  stasis_ = ROBOT_STASIS_BACK_STOP;
-	  back_stop_cnt = 0;
-	  forward_stop_cnt = 0;
-	}
-  }
-
-}
 
 // *****************************************************************************
 // Set the motor speeds

@@ -105,9 +105,6 @@ namespace cirkit
     //! Set new odometry.
     virtual void setOdometry(double new_x, double new_y, double new_yaw);
 
-	//! Set robot stasis.
-	virtual void setStasis(double speed);
-
     //! robot odometry x[m]
     double odometry_x_;
     //! robot odometry y[m]

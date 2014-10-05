@@ -84,7 +84,6 @@ int main(int argc, char** argv)
 	  vel_x = (thirdrobot->odometry_x_ - last_x)/dt;
 	  vel_y = (thirdrobot->odometry_y_ - last_y)/dt;
 	  vel_yaw = (thirdrobot->odometry_yaw_ - last_yaw)/dt;
-	  //thirdrobot->setStasis(vel_x + vel_y);
 
 	  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(thirdrobot->odometry_yaw_);
 
