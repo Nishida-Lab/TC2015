@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   
   thirdrobot = new cirkit::ThirdRobotInterface(imcs01_port, 0, arduino_port, B115200);
 
-  ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 50);
+  ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 1);
   tf::TransformBroadcaster odom_broadcaster;
   ros::Subscriber cmd_vel_sub = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelReceived);
 
@@ -64,7 +64,9 @@ int main(int argc, char** argv)
   current_time = ros::Time::now();
   last_time = ros::Time::now();
 
-  ros::Rate r(10.0);
+  thirdrobot->resetOdometry();
+  thirdrobot->setOdometry(-3.167, -0.475, 1.591);
+  ros::Rate r(20.0);
   while(nh.ok())
     {
 	  current_time = ros::Time::now();
@@ -79,6 +81,7 @@ int main(int argc, char** argv)
         }else{
 		  thirdrobot->calculateOdometry();
         }
+		thirdrobot->sendOpcode('0');
 	  }
 	  dt = (current_time - last_time).toSec();
 	  vel_x = (thirdrobot->odometry_x_ - last_x)/dt;

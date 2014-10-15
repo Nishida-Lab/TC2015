@@ -73,7 +73,7 @@ namespace cirkit
   public:
     //! Constructor
     ThirdRobotInterface(std::string new_serial_port_imcs01, int new_baudrate_imcs01,
-			std::string new_serial_port_arduino, int new_baudrate_arduino);
+						std::string new_serial_port_arduino, int new_baudrate_arduino);
 
     //! Destructor
     ~ThirdRobotInterface();
@@ -91,7 +91,7 @@ namespace cirkit
     virtual int drive(double linear_speed, double angular_speed);
 
     //! Drive direct
-    virtual int driveDirect(int front_angular, double rear_speed);// front_angular in [deg]
+    virtual int driveDirect(double front_angular, double rear_speed);// front_angular in [deg]
 
     //! Read the encoder pulses from iMCs01
     virtual int getEncoderPacket();
@@ -104,6 +104,10 @@ namespace cirkit
 
     //! Set new odometry.
     virtual void setOdometry(double new_x, double new_y, double new_yaw);
+
+    //! Send stepping motor operating code to Arduino
+    int sendOpcode(const char code);
+
 
     //! robot odometry x[m]
     double odometry_x_;
@@ -131,12 +135,10 @@ namespace cirkit
     int parseRearEncoderCounts();
 
 
-    //! Send stepping motor operating code to Arduino
-    int sendOpcode(const char code);
 
     //! For access to iMCs01
     struct uin cmd_uin;
-    struct uout cmd_uout;
+    //struct uout cmd_uout;
     struct ccmd cmd_ccmd;
 
     //! Serial port to which the robot is connected
@@ -162,6 +164,15 @@ namespace cirkit
 
     //! Last rear encoder counts reading. For odometry calculation.
     int last_rear_encoder_counts;
+
+	//! Last time reading encoder
+	double last_rear_encoder_time;
+
+	//! Delta time
+	double delta_rear_encoder_time;
+
+	//! Linear velocity
+	double linear_velocity;
 
     //! Send packet data to Arduino.
     char sendPacket[SENDSIZE];
