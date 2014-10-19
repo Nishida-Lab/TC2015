@@ -440,6 +440,10 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
   // 0.06005
     double dist = (delta_rear_encoder_counts/4.0*26.0/20.0)*(0.06505*M_PI/360.0);// pulse to meter
 	linear_velocity = dist / delta_rear_encoder_time;
+
+
+	//どうもエンコーダの距離が出すぎているのでここで調整
+	dist = dist * 0.90;
 	
 	//    double ang = sin((steer_angle*M_PI)/180.0)/WHEELBASE_LENGTH;//steer_angle is [deg]
     
