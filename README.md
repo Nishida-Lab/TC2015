@@ -12,7 +12,7 @@ $ wstool init .
 
 ```
 $ cd ~/catkin_ws/src
-$ wstool set --git third_robot_2d_nav
+$ wstool set --git third_robot_2dnav https://github.com/CIR-KIT/third_robot_2dnav.git
 $ wstool update
 ```
 
