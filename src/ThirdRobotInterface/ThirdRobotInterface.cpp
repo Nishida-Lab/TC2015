@@ -40,7 +40,12 @@ cirkit::ThirdRobotInterface::ThirdRobotInterface(
 
 cirkit::ThirdRobotInterface::~ThirdRobotInterface()
 {
-  cout << "Destructor called\n" << endl;
+  //  cout << "Destructor called\n" << endl;
+  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
+  cmd_ccmd.offset[1] = 32767; // STOP
+  ioctl(fd_imcs01, URBTC_COUNTER_SET);
+  write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd));
+
   //! iMCs01
   if(fd_imcs01 > 0){
     tcsetattr(fd_imcs01, TCSANOW, &oldtio_imcs01);
@@ -195,6 +200,11 @@ int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed
   double front_angle_deg = 0;
   if(linear_speed == 0.0){
 	front_angle_deg = 0;
+	// その場旋回を要求してきたら後退する。
+	if(fabs(angular_speed) > 0.0){
+	  double rear_speed_m_s = -0.5;
+	  return driveDirect(front_angle_deg, rear_speed_m_s);
+	}
   }else{
 	front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
 	//cout << "front_angle_deg : " << front_angle_deg << endl;
@@ -225,7 +235,7 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 
   static double u = 32767.0;
   static double u1 = 32767.0;
-  static double u2 = 0;
+  static double u2 = 32767.0;
   static double e = 0;
   static double e1 = 0;
   static double e2 = 0;
@@ -238,28 +248,39 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 
   if(rear_speed >= 0.0){	// Forward
 	double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
-
 	if(stasis_ == ROBOT_STASIS_FORWARD || stasis_ == ROBOT_STASIS_FORWARD_STOP){ // Now Forwarding
 	  e = rear_speed_m_s - linear_velocity;
+	  //cout << "e:" << e << endl;
 	  u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
 		- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
-	  duty = MIN(u, 62176);
+
+	  //cout << "test-2:" << u << endl;
+	  if(rear_speed == 0.0){ u = 32767; }
+	  duty = MIN(u, 60000);
+	  duty = MAX(duty, 32767);
 	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 	  //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
 	  cmd_ccmd.offset[1] = (int)(duty);
+	  cout << "duty :" << duty << endl;
 	  runmode = FORWARD_MODE;
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
 	  stasis_ = ROBOT_STASIS_FORWARD;
+	  //cout << "test1:" << cmd_ccmd.offset[1] << endl;
 	}else{ // Now Backing
 	  // Need to stop once.
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 	  cmd_ccmd.offset[1] = 32767; // STOP
 	  runmode = FORWARD_STOP_MODE;
+	  u = 32767;
+	  duty = u;
+	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
+
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); } // error
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
-	  if(forward_stop_cnt >= 10){
+	  //cout <<  "test2" << cmd_ccmd.offset[1] << endl;
+	  if(forward_stop_cnt >= 20){
 		stasis_ = ROBOT_STASIS_FORWARD_STOP;
 		forward_stop_cnt = 0;
 	  }else{
@@ -270,10 +291,16 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
   }else{ // (rear_speed < 0) -> Back
 	if(stasis_ == ROBOT_STASIS_BACK_STOP || stasis_ == ROBOT_STASIS_BACK){ // Now backing
 	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V]. Backing flag.
-	  cmd_ccmd.offset[1] = 52426; // Back is constant speed.
+	  cmd_ccmd.offset[1] = 60000; // Back is constant speed.
 	  runmode = BACK_MODE;
+
+	  u = 32767;
+	  duty = MIN(u, 62176);
+	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
+
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+	  //cout <<  "test3" << cmd_ccmd.offset[1] << endl;
 	  stasis_ = ROBOT_STASIS_BACK;
 	}else{ // Now forwarding
 	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
@@ -281,7 +308,8 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	  runmode = BACK_STOP_MODE;
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1);}
-	  if(back_stop_cnt >= 10){
+	  //	  cout <<  "test4" << cmd_ccmd.offset[1] << endl;
+	  if(back_stop_cnt >= 20){
 		stasis_ = ROBOT_STASIS_BACK_STOP;
 		back_stop_cnt = 0;
 	  }else{
