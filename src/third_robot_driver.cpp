@@ -12,7 +12,6 @@
 #include <string>
 
 #include <boost/thread.hpp>
-
 #include "ThirdRobotInterface/ThirdRobotInterface.h"
 
 boost::mutex access_mutex_;
@@ -43,15 +42,15 @@ int main(int argc, char** argv)
   /* parameter serverにアクセスして"thirdrobot/imcs01_port"の
 	 パラメータが設定されていなければ"/dev/urbtc0"をセットする．
 	 パラメータはlaunchファイルで定義するのが一般的？*/
-  nh.param<std::string>("thirdrobot/imcs01_port", imcs01_port, "/dev/urbtc0");
+  nh.param<std::string>("thirdrobot/imcs01_port", imcs01_port, "/dev/urbtc3");
   nh.param<std::string>("thirdrobot/arduino_port", arduino_port, "/dev/ttyACM0");
   
   thirdrobot = new cirkit::ThirdRobotInterface(imcs01_port, 0, arduino_port, B115200);
-
+ 
   ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 1);
   tf::TransformBroadcaster odom_broadcaster;
   ros::Subscriber cmd_vel_sub = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelReceived);
-
+  
   if( thirdrobot->openSerialPort() == 0){
 	ROS_INFO("Connected to Third Robot.");
 	thirdrobot->driveDirect(0, 0);
@@ -128,11 +127,3 @@ int main(int argc, char** argv)
   thirdrobot->closeSerialPort();
 
 }
-
-
-
-
-
-
-
-

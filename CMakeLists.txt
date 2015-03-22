@@ -115,7 +115,7 @@ add_executable(third_robot_driver_node
 
 add_executable(third_robot_driver_radio_node
   src/radio_class.cpp
-  src/third_robot_driver.cpp 
+  src/third_robot_driver_radio.cpp 
   src/ThirdRobotInterface/ThirdRobotInterface.cpp
 )
 
