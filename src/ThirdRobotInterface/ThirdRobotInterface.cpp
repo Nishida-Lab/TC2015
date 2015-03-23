@@ -15,26 +15,26 @@
 using namespace std;
 
 cirkit::ThirdRobotInterface::ThirdRobotInterface(
-    std::string new_serial_port_imcs01, int new_baudrate_imcs01,
-    std::string new_serial_port_arduino, int new_baudrate_arduino)
+						 std::string new_serial_port_imcs01, int new_baudrate_imcs01,
+						 std::string new_serial_port_arduino, int new_baudrate_arduino)
 {
-    imcs01_port_name = new_serial_port_imcs01;
-    fd_imcs01 = -1;
-    baudrate_imcs01 = new_baudrate_imcs01;
+  imcs01_port_name = new_serial_port_imcs01;
+  fd_imcs01 = -1;
+  baudrate_imcs01 = new_baudrate_imcs01;
 
-    arduino_port_name = new_serial_port_arduino;
-    fd_arduino = -1;
-    baudrate_arduino = new_baudrate_arduino;
+  arduino_port_name = new_serial_port_arduino;
+  fd_arduino = -1;
+  baudrate_arduino = new_baudrate_arduino;
 
-    delta_rear_encoder_counts = -1;
-	steer_angle = 0.0;
+  delta_rear_encoder_counts = -1;
+  steer_angle = 0.0;
 
-    last_rear_encoder_counts = 0;
-	last_rear_encoder_time = 0;
+  last_rear_encoder_counts = 0;
+  last_rear_encoder_time = 0;
 
-	stasis_ = ROBOT_STASIS_FORWARD_STOP;
+  stasis_ = ROBOT_STASIS_FORWARD_STOP;
 
-    resetOdometry();
+  resetOdometry();
 
 }
 
@@ -211,7 +211,9 @@ int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed
   }
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
-	
+
+  cout << front_angle_deg << rear_speed_m_s << endl;
+
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
 

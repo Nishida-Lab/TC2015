@@ -189,19 +189,25 @@ int radio_class::drive(
   // Front angle in deg.
   double front_angle_deg = 0;
   if(linear_speed == 0.0){
-	front_angle_deg = 0;
-	// その場旋回を要求してきたら後退する。
-	if(fabs(angular_speed) > 0.0){
-	  double rear_speed_m_s = -0.5;
-	  return driveDirect(front_angle_deg, rear_speed_m_s);
-	}
+    front_angle_deg = 0;
+    // その場旋回を要求してきたら後退する。
+    if(fabs(angular_speed) > 0.0){
+      double rear_speed_m_s = -0.5;
+      return driveDirect(front_angle_deg, rear_speed_m_s);
+    }
   }else{
-	front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
-	//cout << "front_angle_deg : " << front_angle_deg << endl;
+    front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
+    //cout << "front_angle_deg : " << front_angle_deg << endl;
   }
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
-	
+  
+  //cout << front_angle_deg << rear_speed_m_s << endl;
+  if(front_angle_deg==0){ 
+    front_angle_deg = 1.0;
+  }
+
+
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
 
@@ -236,77 +242,167 @@ int radio_class::driveDirect(
   double duty = 0;
 
   if(rear_speed >= 0.0){	// Forward
-	double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
-	if(stasis_ == ROBOT_STASIS_FORWARD || stasis_ == ROBOT_STASIS_FORWARD_STOP){ // Now Forwarding
-	  e = rear_speed_m_s - linear_velocity;
-	  //cout << "e:" << e << endl;
-	  u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
-		- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
+    double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
+    if(stasis_ == ROBOT_STASIS_FORWARD || stasis_ == ROBOT_STASIS_FORWARD_STOP){ // Now Forwarding
+      e = rear_speed_m_s - linear_velocity;
+      //cout << "e:" << e << endl;
+      u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
+	- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
 
-	  //cout << "test-2:" << u << endl;
-	  if(rear_speed == 0.0){ u = 32767; }
-	  duty = MIN(u, 60000);
-	  duty = MAX(duty, 32767);
-	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
-	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
-	  //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
-	  cmd_ccmd.offset[1] = (int)(duty);
-	  cout << "duty :" << duty << endl;
-	  runmode = FORWARD_MODE;
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
-	  stasis_ = ROBOT_STASIS_FORWARD;
-	  //cout << "test1:" << cmd_ccmd.offset[1] << endl;
-	}else{ // Now Backing
-	  // Need to stop once.
-	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
-	  cmd_ccmd.offset[1] = 32767; // STOP
-	  runmode = FORWARD_STOP_MODE;
-	  u = 32767;
-	  duty = u;
-	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
+      //cout << "test-2:" << u << endl;
+      if(rear_speed == 0.0){ u = 32767; }
+      duty = MIN(u, 60000);
 
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); } // error
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
-	  //cout <<  "test2" << cmd_ccmd.offset[1] << endl;
-	  if(forward_stop_cnt >= 20){
-		stasis_ = ROBOT_STASIS_FORWARD_STOP;
-		forward_stop_cnt = 0;
-	  }else{
-		stasis_ = ROBOT_STASIS_OTHERWISE;
-		forward_stop_cnt++;
-	  }
-	}
+      duty = MAX(duty, 32767);
+      u2 = u1; u1 = duty; e2 = e1; e1 = e;
+      cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
+      //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
+      cmd_ccmd.offset[1] = (int)(duty);
+      cout << "duty :" << duty << endl;
+      runmode = FORWARD_MODE;
+      if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
+      if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+      stasis_ = ROBOT_STASIS_FORWARD;
+      //cout << "test1:" << cmd_ccmd.offset[1] << endl;
+    }else{ // Now Backing
+      // Need to stop once.
+      cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
+      cmd_ccmd.offset[1] = 32767; // STOP
+      runmode = FORWARD_STOP_MODE;
+      u = 32767;
+      duty = u;
+      u2 = u1; u1 = duty; e2 = e1; e1 = e;
+
+      if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); } // error
+      if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+      //cout <<  "test2" << cmd_ccmd.offset[1] << endl;
+      if(forward_stop_cnt >= 20){
+	stasis_ = ROBOT_STASIS_FORWARD_STOP;
+	forward_stop_cnt = 0;
+      }else{
+	stasis_ = ROBOT_STASIS_OTHERWISE;
+	forward_stop_cnt++;
+      }
+    }
   }else{ // (rear_speed < 0) -> Back
-	if(stasis_ == ROBOT_STASIS_BACK_STOP || stasis_ == ROBOT_STASIS_BACK){ // Now backing
-	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V]. Backing flag.
-	  cmd_ccmd.offset[1] = 60000; // Back is constant speed.
-	  runmode = BACK_MODE;
+    if(stasis_ == ROBOT_STASIS_BACK_STOP || stasis_ == ROBOT_STASIS_BACK){ // Now backing
+      cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V]. Backing flag.
+      cmd_ccmd.offset[1] = 60000; // Back is constant speed.
+      runmode = BACK_MODE;
 
-	  u = 32767;
-	  duty = MIN(u, 62176);
-	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
+      u = 32767;
+      duty = MIN(u, 62176);
+      u2 = u1; u1 = duty; e2 = e1; e1 = e;
 
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
-	  //cout <<  "test3" << cmd_ccmd.offset[1] << endl;
-	  stasis_ = ROBOT_STASIS_BACK;
-	}else{ // Now forwarding
-	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
-	  cmd_ccmd.offset[1] = 32767; // STOP
-	  runmode = BACK_STOP_MODE;
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1);}
-	  //	  cout <<  "test4" << cmd_ccmd.offset[1] << endl;
-	  if(back_stop_cnt >= 20){
-		stasis_ = ROBOT_STASIS_BACK_STOP;
-		back_stop_cnt = 0;
-	  }else{
-		stasis_ = ROBOT_STASIS_OTHERWISE;
-		back_stop_cnt++;
-	  }
-	}
+      if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
+      if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+      //cout <<  "test3" << cmd_ccmd.offset[1] << endl;
+      stasis_ = ROBOT_STASIS_BACK;
+    }else{ // Now forwarding
+      cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
+      cmd_ccmd.offset[1] = 32767; // STOP
+      runmode = BACK_STOP_MODE;
+      if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
+      if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1);}
+      //	  cout <<  "test4" << cmd_ccmd.offset[1] << endl;
+      if(back_stop_cnt >= 20){
+	stasis_ = ROBOT_STASIS_BACK_STOP;
+	back_stop_cnt = 0;
+      }else{
+	stasis_ = ROBOT_STASIS_OTHERWISE;
+	back_stop_cnt++;
+      }
+    }
   }
+}
+
+// *****************************************************************************
+// Read the encoders from iMCs01
+int radio_class::getEncoderPacket()
+{
+    if(read(fd_imcs01, &cmd_uin, sizeof(cmd_uin)) != sizeof(cmd_uin)){
+        return -1;
+    }else{
+        return parseEncoderPackets();
+    }
+}
+
+// *****************************************************************************
+// Parse encoder data
+int radio_class::parseEncoderPackets()
+{
+    parseFrontEncoderCounts();
+    parseRearEncoderCounts();
+    return 0;
+}
+
+int radio_class::parseFrontEncoderCounts()
+{
+  const int ave_num = 5;
+  static int cnt = 0;
+  static vector<double> move_ave(ave_num);
+
+  int steer_encoder_counts = (int)(cmd_uin.ct[1]);
+
+  double alpha = 0.0;
+  double beta = 0.0;
+  double R = 0.0;
+  const double n = 1.00;
+
+  if(steer_encoder_counts == 0.0){
+    steer_angle = 0.0;
+  }else{
+    double tmp = steer_encoder_counts*67.0/3633.0;
+    tmp = tmp * M_PI /180;
+    R = 0.96/tan(tmp);
+
+    steer_angle = atan(WHEELBASE_LENGTH/R); // [rad]
+
+    steer_angle = steer_angle*(180.0/M_PI); // [rad]->[deg]
+  }
+  
+  move_ave[cnt%5] = steer_angle;
+  size_t size = move_ave.size();
+  double sum = 0;
+  for(unsigned int i = 0; i < size; i++){
+    sum += move_ave[i];
+  }
+  steer_angle = sum / (double)size;
+  cnt++;
+
+  return 0;
+}
+
+int radio_class::parseRearEncoderCounts()
+{
+  int rear_encoder_counts = (int)(cmd_uin.ct[2]);
+
+  delta_rear_encoder_time = (double)(cmd_uin.time) - last_rear_encoder_time;
+  if(delta_rear_encoder_time < 0){
+    delta_rear_encoder_time = 65535 - (last_rear_encoder_time - cmd_uin.time);
+  }
+  delta_rear_encoder_time = delta_rear_encoder_time / 1000.0; // [ms] -> [s]
+  last_rear_encoder_time = (double)(cmd_uin.time);
+    
+  if(delta_rear_encoder_counts == -1 
+     || rear_encoder_counts == last_rear_encoder_counts){ // First time.
+
+    delta_rear_encoder_counts = 0;
+
+  }else{
+    delta_rear_encoder_counts = rear_encoder_counts - last_rear_encoder_counts;
+
+    // checking imcs01 counter overflow.
+    if(delta_rear_encoder_counts > ROBOT_MAX_ENCODER_COUNTS/10){
+      delta_rear_encoder_counts = delta_rear_encoder_counts - ROBOT_MAX_ENCODER_COUNTS;
+    }
+    if(delta_rear_encoder_counts < -ROBOT_MAX_ENCODER_COUNTS/10){
+      delta_rear_encoder_counts = delta_rear_encoder_counts + ROBOT_MAX_ENCODER_COUNTS;
+    }
+
+  }
+  last_rear_encoder_counts = rear_encoder_counts;
+  return 0;
 }
 
 void radio_class::setOdometry(
@@ -322,4 +418,41 @@ void radio_class::setOdometry(
 void radio_class::resetOdometry()
 {
     setOdometry(0.0, 0.0, 0.0);
+}
+
+// *****************************************************************************
+// Calculate Third Robot odometry
+void radio_class::calculateOdometry()
+{
+  // 0.06005
+  double dist = (delta_rear_encoder_counts/4.0*26.0/20.0)*(0.06505*M_PI/360.0);// pulse to meter
+  linear_velocity = dist / delta_rear_encoder_time;
+
+
+  //どうもエンコーダの距離が出すぎているのでここで調整
+  dist = dist * 0.90;
+	
+  //    double ang = sin((steer_angle*M_PI)/180.0)/WHEELBASE_LENGTH;//steer_angle is [deg]
+    
+  double ang = tan((steer_angle*M_PI)/180.0)/WHEELBASE_LENGTH;//steer_angle is [deg] // もしかしてこっちなのでは
+  if(ang == 0.0){
+    odometry_x_ = odometry_x_ + dist * cos(odometry_yaw_);// [m]
+    odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_);// [m]
+    odometry_yaw_ = odometry_yaw_;        //[rad]
+  }else{
+    odometry_x_ = odometry_x_ + (sin(odometry_yaw_+dist*ang)-sin(odometry_yaw_))/ang;//[m]
+    odometry_y_ = odometry_y_ - (cos(odometry_yaw_+dist*ang)-cos(odometry_yaw_))/ang;//[m]
+    odometry_yaw_ = NORMALIZE(odometry_yaw_ + dist * ang);//[yaw]
+  }
+}
+
+
+int plus_or_minus(double value){
+  if(value > 0){
+    return 1;
+  }else if(value < 0){
+    return -1;
+  }else{
+    return 0;
+  }
 }

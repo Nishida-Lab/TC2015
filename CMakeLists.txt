@@ -102,10 +102,10 @@ include_directories(
 )
 
 ## Declare a cpp library
-add_library(third_robot_interface
-  src/ThirdRobotInterface/ThirdRobotInterface.cpp
-  src/radio_class.cpp
-)
+##add_library(third_robot_interface
+#  src/ThirdRobotInterface/ThirdRobotInterface.cpp
+#  src/radio_class.cpp
+##)
 
 ## Declare a cpp executable
 add_executable(third_robot_driver_node 
@@ -116,7 +116,6 @@ add_executable(third_robot_driver_node
 add_executable(third_robot_driver_radio_node
   src/radio_class.cpp
   src/third_robot_driver_radio.cpp 
-  src/ThirdRobotInterface/ThirdRobotInterface.cpp
 )
 
 ## Add cmake target dependencies of the executable/library

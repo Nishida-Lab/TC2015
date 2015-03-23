@@ -79,8 +79,13 @@ public:
   virtual int openSerialPort();
   virtual int closeSerialPort();
 
-private:
   int drive(double linear_speed, double angular_speed);
+    //! Read the encoder pulses from iMCs01
+  virtual int getEncoderPacket();
+
+    //! Calculate Third robot odometry. Call after reading encoder pulses.
+  virtual void calculateOdometry();
+
   int driveDirect(double front_angular, double rear_speed);
 
 protected:
@@ -100,6 +105,20 @@ public:
 
     //! Robot running status
   int stasis_;
+
+  protected:
+    //! Parse data
+    /*!
+     * Data parsing function. Parses data comming from iMCs01.
+     * \param buffer 			Data to be parsed.
+     *
+     * \return 0 if ok, -1 otherwise.
+     */
+    int parseEncoderPackets();
+    int parseFrontEncoderCounts();
+    int parseRearEncoderCounts();
+
+
 //! For access to iMCs01
     struct uin cmd_uin;
     //struct uout cmd_uout;
