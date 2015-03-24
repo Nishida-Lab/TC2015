@@ -67,100 +67,116 @@
 #endif
 
 class radio_class{
+
 public:
-  radio_class(
-	      std::string,
-	      int,
-	      std::string,
-	      int);
+  //! Constructor
+  radio_class(std::string new_serial_port_imcs01, int new_baudrate_imcs01,std::string new_serial_port_arduino, int new_baudrate_arduino);
+
+  //! Destructor
   ~radio_class();
 
-  virtual int setSerialPort();
+  //! Open the serial port
   virtual int openSerialPort();
+
+  //! Setting the serial port
+  virtual int setSerialPort();
+
+  //! Close the serial port
   virtual int closeSerialPort();
 
-  int drive(double linear_speed, double angular_speed);
-    //! Read the encoder pulses from iMCs01
+  virtual int radio_drive(double);
+
+  //! Drive
+  virtual int drive(double linear_speed, double angular_speed);
+
+  //! Drive direct
+  virtual int driveDirect(double front_angular, double rear_speed);// front_angular in [deg]
+
+  //! Read the encoder pulses from iMCs01
   virtual int getEncoderPacket();
 
-    //! Calculate Third robot odometry. Call after reading encoder pulses.
+  //! Calculate Third robot odometry. Call after reading encoder pulses.
   virtual void calculateOdometry();
 
-  int driveDirect(double front_angular, double rear_speed);
-
-protected:
-public:
+  //! Reset Third robot odometry.
   virtual void resetOdometry();
-    //! Set new odometry.
+
+  //! Set new odometry.
   virtual void setOdometry(double new_x, double new_y, double new_yaw);
+
+  //! Send stepping motor operating code to Arduino
+  int sendOpcode(const char code);
+
+
   //! robot odometry x[m]
   double odometry_x_;
-    //! robot odometry y[m]
+  //! robot odometry y[m]
   double odometry_y_;
-    //! robot odometry yaw[rad]
+  //! robot odometry yaw[rad]
   double odometry_yaw_;
 	
-    //! Front steer angle[deg].
+  //! Front steer angle[deg].
   double steer_angle;
 
-    //! Robot running status
+  //! Robot running status
   int stasis_;
 
-  protected:
-    //! Parse data
-    /*!
-     * Data parsing function. Parses data comming from iMCs01.
-     * \param buffer 			Data to be parsed.
-     *
-     * \return 0 if ok, -1 otherwise.
-     */
-    int parseEncoderPackets();
-    int parseFrontEncoderCounts();
-    int parseRearEncoderCounts();
+protected:
+  //! Parse data
+  /*!
+   * Data parsing function. Parses data comming from iMCs01.
+   * \param buffer 			Data to be parsed.
+   *
+   * \return 0 if ok, -1 otherwise.
+   */
+  int parseEncoderPackets();
+  int parseFrontEncoderCounts();
+  int parseRearEncoderCounts();
 
 
-//! For access to iMCs01
-    struct uin cmd_uin;
-    //struct uout cmd_uout;
-    struct ccmd cmd_ccmd;
 
-    //! Serial port to which the robot is connected
-    std::string imcs01_port_name;
-    std::string arduino_port_name;
+  //! For access to iMCs01
+  struct uin cmd_uin;
+  //struct uout cmd_uout;
+  struct ccmd cmd_ccmd;
 
-    //! File descriptor
-    int fd_imcs01;
-    int fd_arduino;
+  //! Serial port to which the robot is connected
+  std::string imcs01_port_name;
+  std::string arduino_port_name;
 
-    //! Baudrate
-    int baudrate_imcs01;
-    int baudrate_arduino;
+  //! File descriptor
+  int fd_imcs01;
+  int fd_arduino;
 
-    //! Old and new termios struct
-    termios oldtio_imcs01;
-    termios newtio_imcs01;
-    termios oldtio_arduino;
-    termios newtio_arduino;
+  //! Baudrate
+  int baudrate_imcs01;
+  int baudrate_arduino;
 
-    //! Delta rear encoder counts. 
-    int delta_rear_encoder_counts;
+  //! Old and new termios struct
+  termios oldtio_imcs01;
+  termios newtio_imcs01;
+  termios oldtio_arduino;
+  termios newtio_arduino;
 
-    //! Last rear encoder counts reading. For odometry calculation.
-    int last_rear_encoder_counts;
+  //! Delta rear encoder counts. 
+  int delta_rear_encoder_counts;
 
-	//! Last time reading encoder
+  //! Last rear encoder counts reading. For odometry calculation.
+  int last_rear_encoder_counts;
+
+  //! Last time reading encoder
   double last_rear_encoder_time;
 
-	//! Delta time
+  //! Delta time
   double delta_rear_encoder_time;
 
-	//! Linear velocity
+  //! Linear velocity
   double linear_velocity;
 
-    //! Send packet data to Arduino.
+  //! Send packet data to Arduino.
   char sendPacket[SENDSIZE];
 
-	//! Forward or Back mode flag
+  //! Forward or Back mode flag
   int runmode;
 };
 

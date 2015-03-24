@@ -4,10 +4,8 @@
 #include <boost/thread.hpp>
 
 boost::mutex access_mutex_;
-
 std::string imcs01_port;
 std::string arduino_port;
-
 ros::Subscriber sub;
 ros::Publisher  pub;
 
@@ -22,7 +20,8 @@ void joy_nodeCb(const sensor_msgs::Joy::ConstPtr &msg){
 
   boost::mutex::scoped_lock(access_mutex_);
   pub.publish(arduino_msgs);
-  Radio_class->drive(arduino_msgs.linear.x, arduino_msgs.angular.z);
+  Radio_class->radio_drive(arduino_msgs.linear.x);
+
 }
 
 int main(int argc,char **argv)
@@ -35,7 +34,7 @@ int main(int argc,char **argv)
   ros::NodeHandle n;
   ROS_INFO("RADIO_PROGRAM");
 
-  Radio_class = new radio_class("/dev/urbtc2", 0, "/dev/ttyACM0", B115200);
+  Radio_class = new radio_class("/dev/urbtc3", 0, "/dev/ttyACM0", B115200);
 
   sub = n.subscribe<sensor_msgs::Joy>("joy",1,joy_nodeCb);
   pub = n.advertise<geometry_msgs::Twist>("stepping_motor",1000);
