@@ -8,10 +8,14 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   move_base_msgs
   roscpp
+  rospy
+  rospeex_msgs
+  rospeex_if
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -84,6 +88,8 @@ catkin_package(
 #  LIBRARIES third_robot_nav_goals
 #  CATKIN_DEPENDS actionlib move_base_msgs roscpp
 #  DEPENDS system_lib
+  CATKIN_DEPENDS roscpp rospy std_msgs rospeex_msgs rospeex_if roslib
+  DEPENDS system_lib
 )
 
 ###########
@@ -162,7 +168,5 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 add_executable(third_robot_send_goals src/third_robot_send_goals.cpp)
-add_executable(third_robot_save_goals src/third_robot_save_goals.cpp)
 
 target_link_libraries(third_robot_send_goals ${catkin_LIBRARIES})
-target_link_libraries(third_robot_save_goals ${catkin_LIBRARIES})

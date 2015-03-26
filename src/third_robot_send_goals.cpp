@@ -16,6 +16,9 @@ read_csv.cpp : https://gist.github.com/yoneken/5765597#file-read_csv-cpp
 #include <boost/tokenizer.hpp>
 #include <boost/shared_array.hpp>
 
+// #include "sound/sound_service.h"
+// #include "rospeex_if/rospeex.h"
+
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -27,7 +30,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 double calculateDistance(double target_x, double target_y , double now_x, double now_y) 
 {
-  return  sqrt(pow(target_x - now_x, 2.0) + pow(target_y - now_y, 2.0));
+  return  sqrt(pow((target_x - now_x), 2.0) + pow((target_y - now_y), 2.0));
 }
 
 
@@ -42,7 +45,7 @@ public:
 
 	ros::NodeHandle n("~");
 	n.param<std::string>("waypointsfile", filename, 
-						 "/home/yuta/catkin_ws/src/third_robot_nav_goals/waypoints/waypoints_test.csv");
+						 "/home/ryodo/Documents/Kyutech/CIR-KIT/catkin_ws/src/third_robot_nav_goals/monotsukuri150206-01.csv");
 	n.param("start_target_num", target_num, 0);
 	ROS_INFO("[Start target num] : %d", target_num);
 	ROS_INFO("[Waypoints file name] : %s", filename.c_str());
@@ -53,6 +56,10 @@ public:
 	ROS_INFO("Waiting for action server to start.");
 	ac.waitForServer();
 
+	// speeking
+	// client = nh.serviceClient<sound::sound_service>("sound_service");
+	// srv.request.situation = "start.wav";
+	// client.call(srv);
   }
 
   void sendNewGoal()
@@ -93,11 +100,11 @@ public:
 	// ROS_INFO("[num ]: %d", target_num);
 	// ROS_INFO("[tarX]: %lf [tarY]: %lf", tar_x, tar_y);
 	// ROS_INFO("[nowX]: %lf [nowY]: %lf", now_x, now_y);
-	if(dist <= 3.0){
+	if(dist <= 2.0){
 	  stasis = NEARGOAL;
-	  ROS_INFO("Reached !!! [Dist] : %lf", dist);
+	  ROS_INFO("Reached WayPT[%d]!!! [Dist] : %lf",target_num, dist);
 	}else{
-	  ROS_INFO("[Dist]: %lf",dist);
+	  ROS_INFO("Search WayPT[%d] [Dist]: %lf",target_num, dist);
 	}
   }
 
@@ -112,39 +119,53 @@ public:
 
   int readWaypoint(std::string filename)
   {
-	const int rows_num = 4; // x, y, z, w
-	boost::char_separator<char> sep("," ,"", boost::keep_empty_tokens);
-	std::ifstream ifs(filename.c_str());
-	std::string line;
+    const int rows_num = 7; // x, y, z, Qx,Qy,Qz,Qw
+    boost::char_separator<char> sep("," ,"", boost::keep_empty_tokens);
+    std::ifstream ifs(filename.c_str());
+    std::string line;
 	
-	while(ifs.good()){
-	  getline(ifs, line);
-	  if(line.empty()){ break; }
-	  tokenizer tokens(line, sep);
-	  std::vector<double> data;
-	  tokenizer::iterator it = tokens.begin();
-	  for(; it != tokens.end() ; ++it){
-		std::stringstream ss;
-		double d;
-		ss << *it;
-		ss >> d;
-		data.push_back(d);
-	  }
-	  if(data.size() != rows_num){
-		ROS_ERROR("Row size is mismatch!!");
-		return -1;
-	  }else{
-		move_base_msgs::MoveBaseGoal goal;
-		goal.target_pose.pose.position.x	= data[0];
-		goal.target_pose.pose.position.y	= data[1];
-		goal.target_pose.pose.position.z	= data[2];
-		goal.target_pose.pose.orientation.w = data[3];
-		goals.push_back(goal);
+    while(ifs.good()){
+      getline(ifs, line);
+      if(line.empty()){ break; }
+      tokenizer tokens(line, sep);
+      std::vector<double> data;
+      tokenizer::iterator it = tokens.begin();
+      for(; it != tokens.end() ; ++it){
+	std::stringstream ss;
+	double d;
+	ss << *it;
+	ss >> d;
+	data.push_back(d);
+      }
+      if(data.size() != rows_num){
+	ROS_ERROR("Row size is mismatch!!");
+	return -1;
+      }else{
+	move_base_msgs::MoveBaseGoal goal;
+	goal.target_pose.pose.position.x    = data[0];
+	goal.target_pose.pose.position.y    = data[1];
+	goal.target_pose.pose.position.z    = data[2];
+	goal.target_pose.pose.orientation.x = data[3];
+	goal.target_pose.pose.orientation.y = data[4];
+	goal.target_pose.pose.orientation.z = data[5];
+	goal.target_pose.pose.orientation.w = data[6];
+
+	goals.push_back(goal);
         ROS_INFO("[%d]--> [X]: %f [Y]: %f", (int)goals.size(), goal.target_pose.pose.position.x, goal.target_pose.pose.position.y);
-	  }
-	}
-	finish_num = (int)goals.size();
-	return 0;
+      }
+    }
+    finish_num = (int)goals.size();
+    return 0;
+  }
+
+  void speakWaypointsNumber(int num)
+  {
+	std::string waypointsname = "check";
+	std::stringstream ss;
+	ss << num;
+	waypointsname = waypointsname + ss.str() + ".wav";
+	// srv.request.situation = waypointsname.c_str();
+	// client.call(srv);
   }
 
   void run()
@@ -154,13 +175,14 @@ public:
 	  ret = stasis;
 	  if(ret == NEARGOAL || ret == INITNAVI){
 		if(ret == 1){
+		  speakWaypointsNumber(target_num);
 		  this->cancelGoal();
 		}
 		if(target_num != finish_num){
 		  this->sendNewGoal();
 		  target_num++;
 		}else{
-		  break;
+		  break; // Finish!
 		}
 	  }
 	  ros::spinOnce();
@@ -175,6 +197,10 @@ private:
   int finish_num;
   ros::Rate rate;
   std::vector<move_base_msgs::MoveBaseGoal> goals;
+
+  ros::NodeHandle nh;
+  // ros::ServiceClient client;
+  // sound::sound_service srv;
 };
 
 
