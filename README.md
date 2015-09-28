@@ -2,8 +2,8 @@
 つくばチャレンジ2015用のレポジトリです。  
 基本的には[HSR_Hackathon レポジトリ（研究室メンバーのみ閲覧可）](http://github.com/Nishida-Lab/HSR-Hackathon)と運営の仕方は一緒です。  
 詳しくはそちらをご覧ください。  
+ただし、**Git-flowではなく、GitHub-flowを使っています。**ご注意ください。
 ![TC2014](.image/tc2014.jpg)
-
 
 # How to Download and Use ?
 1. `catkin workspace`の作成  
