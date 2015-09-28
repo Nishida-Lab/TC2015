@@ -116,6 +116,8 @@ clone, push, pull, mergeの流れを説明しておきます。
 以上が、GitHub-flowの手順です。参考リンクにわかりやすいフローチャートがあります。ぜひ見てください。  
 HSR Hackathonでは，Git-flowを使おうとしましたが、必要のないブランチが増え、非常に複雑になってしまったので、この方式に変えました。  
 HSR Hackathon参加者の方は、これまでの`develop`ブランチが`master`ブランチに変わり、`feature/hoghoge`ブランチが`hogehoge`ブランチになっただけと考えてください。  
+あ、あと、最近発見したんですが、コミットのコメントの書き方は、[ここ](http://qiita.com/itosho/items/9565c6ad2ffc24c09364)を参考にするといいかもです。  
+[Ariyu](http://github.com/Ariyu)さんが、僕よりも前からやってるので、聞いてみるといいかもです。  
 
 ## Synnary
 ご意見がございましたら、是非是非、[RyodoTanaka](http://github.com/Ryodotanaka)までお知らせください。  
