@@ -102,6 +102,7 @@ clone, push, pull, mergeの流れを説明しておきます。
 	 ```bash
 	 git checkout master
 	 git branch -d <hogehoge>
+	 git push --delete origin <hogehoge>
 	 ```
 
 	- 許可されなかったら（GitHub上のPullRequestに、いちゃもんメッセージが付けられます。）  
