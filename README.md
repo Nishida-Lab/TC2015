@@ -120,6 +120,6 @@ HSR Hackathon参加者の方は、これまでの`develop`ブランチが`master
 あ、あと、最近発見したんですが、コミットのコメントの書き方は、[ここ](http://qiita.com/itosho/items/9565c6ad2ffc24c09364)を参考にするといいかもです。  
 [Ariyu](http://github.com/Ariyu)さんが、僕よりも前からやってるので、聞いてみるといいかもです。  
 
-## Synnary
+## Summary
 ご意見がございましたら、是非是非、[RyodoTanaka](http://github.com/Ryodotanaka)までお知らせください。  
 参加者を募集しています。よろしくお願いします。 m(_ _)m
