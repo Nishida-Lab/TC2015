@@ -6,9 +6,9 @@
 
 
 # How to Download and Use ?
-1. `catkin workspace`の作成
-  好きなディレクトリに`catkin`ワークスペースを作成してください。
-  ただし、`<catkin_ws>`は自分が`catkin`ワークスペースを作成するディレクトリに読み替えてください。
+1. `catkin workspace`の作成  
+  好きなディレクトリに`catkin`ワークスペースを作成してください。  
+  ただし、`<catkin_ws>`は自分が`catkin`ワークスペースを作成するディレクトリに読み替えてください。  
   ```bash
   mkdir -p <catkin_ws>/src
   cd <catkin_ws>/src
@@ -16,8 +16,8 @@
   cd <catkin_ws>
   ```
 
-2. `clone`
-   本レポジトリを好きなディレクトリに`clone`してください。
+2. `clone`  
+   本レポジトリを好きなディレクトリに`clone`してください。  
    - HTTP
 	 ```bash
 	 git clone https://github.com/Nishida-Lab/TC2015.git
@@ -28,27 +28,27 @@
 	  git clone git@github.com:Nishida-Lab/TC2015.git
 	  ```
 
-3. `wstool`
+3. `wstool`  
    ```bash
    cd <catkin_ws>
    wstool init src src/HSR-Hackathon/.rosinstall
    ```
 
-4. `rosdep`
+4. `rosdep`  
   ```bash
   cd <catkin_ws>
   rosdep install -i --from-paths src
   ```
 
-5. `catkin_make`
+5. `catkin_make`  
    ```bash
    cd <catkin_ws>
    catkin_make
    ```
 
 ####！！Caution！！
-3.の手順で追加したパッケージは本レポジトリとは別にgit管理がされています。
-これらの追加パッケージが更新された場合は以下の手順でアップデートができます。
+3.の手順で追加したパッケージは本レポジトリとは別にgit管理がされています。  
+これらの追加パッケージが更新された場合は以下の手順でアップデートができます。  
 ```bash
 wstool update -t src
 ```
@@ -60,11 +60,11 @@ wstoolについての詳しい説明は、以下をご覧ください。
 - [GitHub Flow (Japanese translation)](https://gist.github.com/Gab-km/3705015)
 - [Github-flowをわかりやすく図解してみた](http://b.pyar.bz/blog/2014/01/22/github-flow/)
 
-本レポジトリでは、**GitHub flow**に従います。何だそれ？って方は、上記のリンクをご覧ください。
-clone, push, pull, mergeの流れを説明しておきます。
+本レポジトリでは、**GitHub flow**に従います。何だそれ？って方は、上記のリンクをご覧ください。  
+clone, push, pull, mergeの流れを説明しておきます。  
 
-1. Clone
-   本レポジトリを好きなディレクトリに`clone`してください。
+1. Clone  
+   本レポジトリを好きなディレクトリに`clone`してください。  
    - HTTP
 	 ```bash
 	 git clone https://github.com/Nishida-Lab/TC2015.git
@@ -75,24 +75,24 @@ clone, push, pull, mergeの流れを説明しておきます。
 	  git clone git@github.com:Nishida-Lab/TC2015.git
 	  ```
 
-2. Branchを作成
-   `master`ブランチ直下に作業内容がわかるような、任意の名前のブランチを作成してください。
-   尚、以下の`<hogehoge>`には、任意のブランチ名が入ります。
+2. Branchを作成  
+   `master`ブランチ直下に作業内容がわかるような、任意の名前のブランチを作成してください。  
+   尚、以下の`<hogehoge>`には、任意のブランチ名が入ります。  
    ```bash
    git checkout maser
    git checkout -b <hogehoge>
    ```
 
-3. Cording
-   開発してください。
+3. Cording  
+   開発してください。  
 
-4. Push
-   自分で作成したブランチにPushしてください。
+4. Push  
+   自分で作成したブランチにPushしてください。  
    ```bash
    git push origin <hogehoge>
    ```
 
-5. Pull Request
+5. Pull Request  
    Github上で、Pull Requestを作成してください。  
    **Pull Request**ってなんぞ？っていう方は、[こちらの記事](http://qiita.com/samurairunner/items/7442521bce2d6ac9330b)が参考になると思います。  
    Pull Requestの結果、
@@ -104,11 +104,11 @@ clone, push, pull, mergeの流れを説明しておきます。
 	 git branch -d <hogehoge>
 	 ```
 
-	- 許可されなかったら（GitHub上のPullRequestに、いちゃもんメッセージが付けられます。）
+	- 許可されなかったら（GitHub上のPullRequestに、いちゃもんメッセージが付けられます。）  
 	手順3. へ。頑張ってください。
 
-6. Pull
-   手順5. が終わっている方のみ、Pullしてください。
+6. Pull  
+   手順5. が終わっている方のみ、Pullしてください。  
    ```bash
    git pull origin master
    ```
@@ -116,7 +116,6 @@ clone, push, pull, mergeの流れを説明しておきます。
 以上が、GitHub-flowの手順です。参考リンクにわかりやすいフローチャートがあります。ぜひ見てください。  
 HSR Hackathonでは，Git-flowを使おうとしましたが、必要のないブランチが増え、非常に複雑になってしまったので、この方式に変えました。  
 HSR Hackathon参加者の方は、これまでの`develop`ブランチが`master`ブランチに変わり、`feature/hoghoge`ブランチが`hogehoge`ブランチになっただけと考えてください。  
-よろしくお願いします。
 
 ## Synnary
 ご意見がございましたら、是非是非、[RyodoTanaka](http://github.com/Ryodotanaka)までお知らせください。  
