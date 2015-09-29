@@ -160,16 +160,34 @@ namespace cirkit
     termios newtio_arduino;
 
     //! Delta rear encoder counts. 
-    int delta_rear_encoder_counts;
-
+	//! 0 is right, 1 is left.
+    int delta_rear_encoder_counts[2];
+	
     //! Last rear encoder counts reading. For odometry calculation.
-    int last_rear_encoder_counts;
+	//! 0 is right, 1 is left.
+    int last_rear_encoder_counts[2];
 
 	//! Last time reading encoder
 	double last_rear_encoder_time;
 
 	//! Delta time
 	double delta_rear_encoder_time;
+
+	//! Delta dist
+	//! 0 is right, 1 is left.
+	double delta_dist[2];
+
+	//! num of pulse
+	const double PulseRate = 4000.0;
+	
+	//! GEER_RATE
+	const double GeerRate = 4.0;
+	
+	//! Wheel Diameter[m]
+	const double WheelDiameter[2] = {0.15, 0.15};
+
+	//! Tred width[m]
+	const double TredWidth = 0.3;
 
 	//! Linear velocity
 	double linear_velocity;

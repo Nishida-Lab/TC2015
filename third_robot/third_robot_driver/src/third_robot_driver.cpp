@@ -40,8 +40,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle nh;
   /* parameter serverにアクセスして"thirdrobot/imcs01_port"の
-	 パラメータが設定されていなければ"/dev/urbtc0"をセットする．
-	 パラメータはlaunchファイルで定義するのが一般的？*/
+	 パラメータが設定されていなければ"/dev/urbtc0"をセットする．*/
   nh.param<std::string>("thirdrobot/imcs01_port", imcs01_port, "/dev/urbtc2");
   nh.param<std::string>("thirdrobot/arduino_port", arduino_port, "/dev/ttyACM0");
   

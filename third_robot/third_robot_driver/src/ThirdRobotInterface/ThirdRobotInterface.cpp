@@ -26,10 +26,12 @@ cirkit::ThirdRobotInterface::ThirdRobotInterface(
   fd_arduino = -1;
   baudrate_arduino = new_baudrate_arduino;
 
-  delta_rear_encoder_counts = -1;
+  for(int i = 0; i < 2; i++){
+	delta_rear_encoder_counts[i] = -1;
+	last_rear_encoder_counts[i] = 0;
+  }
   steer_angle = 0.0;
 
-  last_rear_encoder_counts = 0;
   last_rear_encoder_time = 0;
 
   stasis_ = ROBOT_STASIS_FORWARD_STOP;
@@ -402,34 +404,37 @@ int cirkit::ThirdRobotInterface::parseFrontEncoderCounts()
 
 int cirkit::ThirdRobotInterface::parseRearEncoderCounts()
 {
-    int rear_encoder_counts = (int)(cmd_uin.ct[2]);
+  //! 0 is right, 1 is left.
+  int rear_encoder_counts[2] = {(int)(cmd_uin.ct[2]), -(int)(cmd_uin.ct[3])};
 
-	delta_rear_encoder_time = (double)(cmd_uin.time) - last_rear_encoder_time;
-	if(delta_rear_encoder_time < 0){
-	  delta_rear_encoder_time = 65535 - (last_rear_encoder_time - cmd_uin.time);
-	}
-	delta_rear_encoder_time = delta_rear_encoder_time / 1000.0; // [ms] -> [s]
-	last_rear_encoder_time = (double)(cmd_uin.time);
+  delta_rear_encoder_time = (double)(cmd_uin.time) - last_rear_encoder_time;
+  if(delta_rear_encoder_time < 0){
+	delta_rear_encoder_time = 65535 - (last_rear_encoder_time - cmd_uin.time);
+  }
+  delta_rear_encoder_time = delta_rear_encoder_time / 1000.0; // [ms] -> [s]
+  last_rear_encoder_time = (double)(cmd_uin.time);
     
-	if(delta_rear_encoder_counts == -1 
-       || rear_encoder_counts == last_rear_encoder_counts){ // First time.
+  for(int i = 0; i < 2; i++){
+	if(delta_rear_encoder_counts[i] == -1 
+	   || rear_encoder_counts[i] == last_rear_encoder_counts[i]){ // First time.
 
-        delta_rear_encoder_counts = 0;
+	  delta_rear_encoder_counts[i] = 0;
 
-    }else{
-        delta_rear_encoder_counts = rear_encoder_counts - last_rear_encoder_counts;
+	}else{
+	  delta_rear_encoder_counts[i] = rear_encoder_counts[i] - last_rear_encoder_counts[i];
 
-        // checking imcs01 counter overflow.
-        if(delta_rear_encoder_counts > ROBOT_MAX_ENCODER_COUNTS/10){
-            delta_rear_encoder_counts = delta_rear_encoder_counts - ROBOT_MAX_ENCODER_COUNTS;
-        }
-        if(delta_rear_encoder_counts < -ROBOT_MAX_ENCODER_COUNTS/10){
-            delta_rear_encoder_counts = delta_rear_encoder_counts + ROBOT_MAX_ENCODER_COUNTS;
-        }
+	  // checking imcs01 counter overflow.
+	  if(delta_rear_encoder_counts[i] > ROBOT_MAX_ENCODER_COUNTS/10){
+		delta_rear_encoder_counts[i] = delta_rear_encoder_counts[i] - ROBOT_MAX_ENCODER_COUNTS;
+	  }
+	  if(delta_rear_encoder_counts[i] < -ROBOT_MAX_ENCODER_COUNTS/10){
+		delta_rear_encoder_counts[i] = delta_rear_encoder_counts[i] + ROBOT_MAX_ENCODER_COUNTS;
+	  }
+	}
+	last_rear_encoder_counts[i] = rear_encoder_counts[i];
+  }
 
-    }
-    last_rear_encoder_counts = rear_encoder_counts;
-    return 0;
+  return 0;
 }
 
 // *****************************************************************************
@@ -467,26 +472,30 @@ void cirkit::ThirdRobotInterface::setOdometry(double new_x, double new_y, double
 // Calculate Third Robot odometry
 void cirkit::ThirdRobotInterface::calculateOdometry()
 {
-  // 0.06005
-    double dist = (delta_rear_encoder_counts/4.0*26.0/20.0)*(0.06505*M_PI/360.0);// pulse to meter
-	linear_velocity = dist / delta_rear_encoder_time;
+  for(int i = 0; i < 2; i++){
+	delta_dist[i] = (delta_rear_encoder_counts[0]/PulseRate/GeerRate)*(WheelDiameter[i]*M_PI);
+  }
 
+  double delta_L = (delta_dist[0] + delta_dist[1])/2.0;
+  double delta_yaw = (delta_dist[0] - delta_dist[1])/TredWidth;
+  double rho = 0;
+  double dist = 0;
 
-	//どうもエンコーダの距離が出すぎているのでここで調整
-	dist = dist * 0.90;
-	
-	//    double ang = sin((steer_angle*M_PI)/180.0)/WHEELBASE_LENGTH;//steer_angle is [deg]
-    
-	double ang = tan((steer_angle*M_PI)/180.0)/WHEELBASE_LENGTH;//steer_angle is [deg] // もしかしてこっちなのでは
-    if(ang == 0.0){
-        odometry_x_ = odometry_x_ + dist * cos(odometry_yaw_);// [m]
-        odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_);// [m]
-        odometry_yaw_ = odometry_yaw_;        //[rad]
-    }else{
-        odometry_x_ = odometry_x_ + (sin(odometry_yaw_+dist*ang)-sin(odometry_yaw_))/ang;//[m]
-        odometry_y_ = odometry_y_ - (cos(odometry_yaw_+dist*ang)-cos(odometry_yaw_))/ang;//[m]
-        odometry_yaw_ = NORMALIZE(odometry_yaw_ + dist * ang);//[yaw]
-    }
+  if(fabs(delta_yaw) < 1e-3){
+	delta_yaw = 0;
+  }
+
+  if(delta_yaw == 0.0){
+	odometry_x_ = odometry_x_ + delta_L * cos(odometry_yaw_);
+	odometry_y_ = odometry_y_ + delta_L * sin(odometry_yaw_);
+  }else{
+	rho = delta_L/delta_yaw;
+	dist = 2.0*rho*sin((delta_yaw/2.0));
+	odometry_x_ = odometry_x_ + dist * cos(odometry_yaw_ + (delta_yaw/2.0));
+	odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_ + (delta_yaw/2.0));
+	odometry_yaw_ += delta_yaw;
+  }
+
 }
 
 

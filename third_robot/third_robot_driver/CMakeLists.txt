@@ -94,8 +94,11 @@ catkin_package(
 ## Build ##
 ###########
 
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+
 include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
