@@ -1,0 +1,11 @@
+<launch>
+  
+  <node pkg="third_robot_nav_goals" 
+		type="third_robot_send_goals" 
+		name="third_robot_send_goals"
+		output="screen">
+    <param name="start_target_num" value="0" />
+    <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/monotsukuri150206-01.csv" />
+  </node>
+
+</launch>
