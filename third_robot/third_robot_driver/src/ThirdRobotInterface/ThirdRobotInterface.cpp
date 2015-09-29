@@ -495,7 +495,10 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
 	odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_ + (delta_yaw/2.0));
 	odometry_yaw_ += delta_yaw;
   }
-
+  std::cout << "odom_x : " << odometry_x_ << std::endl;
+  std::cout << "odom_y : " << odometry_y_ << std::endl;
+  std::cout << "odom_t : " << odometry_yaw_ << std::endl;
+  std::cout << "----------" << std::endl;
 }
 
 
