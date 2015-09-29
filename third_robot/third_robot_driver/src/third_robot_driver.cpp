@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   /* parameter serverにアクセスして"thirdrobot/imcs01_port"の
 	 パラメータが設定されていなければ"/dev/urbtc0"をセットする．*/
-  nh.param<std::string>("thirdrobot/imcs01_port", imcs01_port, "/dev/urbtc2");
+  nh.param<std::string>("thirdrobot/imcs01_port", imcs01_port, "/dev/urbtc0");
   nh.param<std::string>("thirdrobot/arduino_port", arduino_port, "/dev/ttyACM0");
   
   thirdrobot = new cirkit::ThirdRobotInterface(imcs01_port, 0, arduino_port, B115200);
@@ -63,7 +63,8 @@ int main(int argc, char** argv)
   last_time = ros::Time::now();
 
   thirdrobot->resetOdometry();
-  thirdrobot->setOdometry(-3.167, -0.475, 1.591);
+  // thirdrobot->setOdometry(-3.167, -0.475, 1.591); 
+  thirdrobot->setOdometry(0,0,0);
   ros::Rate r(20.0);
   while(nh.ok())
     {
