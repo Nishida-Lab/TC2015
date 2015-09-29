@@ -178,16 +178,16 @@ namespace cirkit
 	double delta_dist[2];
 
 	//! num of pulse
-	const double PulseRate = 4000.0;
+	const double PulseRate = 10.0;
 	
 	//! GEER_RATE
-	const double GeerRate = 4.0;
+	const double GeerRate = 30.0;
 	
 	//! Wheel Diameter[m]
 	const double WheelDiameter[2] = {0.15, 0.15};
 
 	//! Tred width[m]
-	const double TredWidth = 0.3;
+	const double TredWidth = 0.5;
 
 	//! Linear velocity
 	double linear_velocity;
