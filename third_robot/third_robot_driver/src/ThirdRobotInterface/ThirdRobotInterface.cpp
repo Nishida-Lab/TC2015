@@ -473,7 +473,7 @@ void cirkit::ThirdRobotInterface::setOdometry(double new_x, double new_y, double
 void cirkit::ThirdRobotInterface::calculateOdometry()
 {
   for(int i = 0; i < 2; i++){
-	delta_dist[i] = (delta_rear_encoder_counts[0]/PulseRate/GeerRate)*(WheelDiameter[i]*M_PI);
+	delta_dist[i] = (delta_rear_encoder_counts[i]/PulseRate/GeerRate)*(WheelDiameter[i]*M_PI);
   }
 
   double delta_L = (delta_dist[0] + delta_dist[1])/2.0;
