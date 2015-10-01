@@ -176,7 +176,10 @@ namespace cirkit
 	//! Delta dist
 	//! 0 is right, 1 is left.
 	double delta_dist[2] = {0, 0};
+	double last_delta_dist[2] = {0, 0};
 
+	//! [k-1]のyaw
+	double last_odometry_yaw = 0.0;
 	//! num of pulse
 	const double PulseRate = 40.0;
 	
