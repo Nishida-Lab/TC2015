@@ -52,14 +52,14 @@ const int ccw_plus = 5;
 const int ccw_minus = 6;
 
 /* Declare proto type functions. */
-void steer(const char direction); // Write pulse to the stepping motor.
-void motorCb(const geometry_msgs::Twist& msg); // Call back function of the motor_driver topic.
+void gen_pulse(const char direction); // Write pulse to the stepping motor.
+void steerCb(const geometry_msgs::Twist& msg); // Call back function of the motor_driver topic.
 
 /* Declare global constants. */
 const unsigned int PULSE_FREQUENCY = 1000l * 1000 / (PULSE_WIDTH_MICRO_SECOND * 2); // Get frequency of pulse.
 /* Declare global variables. */
 ros::NodeHandle nh; // The nodeHandle.
-ros::Subscriber<geometry_msgs::Twist> sub("motor_driver", &motorCb); // Set subscribe the motor_driver topic.
+ros::Subscriber<geometry_msgs::Twist> sub("steer_ctrl", &steerCb); // Set subscribe the motor_driver topic.
 
 void setup() {
   /* Set pins Mode. */
@@ -69,15 +69,11 @@ void setup() {
   }
   /* Node handle setting. */
   nh.initNode(); // First setup the node handle.
-  nh.subscribe(sub); // Start subscribe the motor_driver topic.
+  nh.subscribe(sub); // Start subscribe the "steer_ctrl" topic.
 }
 
 void loop() {
-  //nh.spinOnce(); // Check topic and if change it, run the call back function.
-  steer(RIGHT);
-  delay(1000);
-  steer(LEFT);
-  delay(1000);
+  nh.spinOnce(); // Check topic and if change it, run the call back function.
 }
 
 /**
@@ -87,10 +83,10 @@ void loop() {
  * @author "Yusuke Doi"
  * @param msg This param is msg object of the motor_driver topic.
  */
-void motorCb(const geometry_msgs::Twist& msg) {
-  if (msg.angular.z < 0) steer(RIGHT); // Minus mean CCW or right.
-  else if (msg.angular.z > 0) steer(LEFT); // Plus mean CW or left.
-  else steer(KEEP); // Zero mean keep steer.
+void steerCb(const geometry_msgs::Twist& msg) {
+  if (msg.angular.z < 0) gen_pluse(RIGHT); // Minus mean CCW or right.
+  else if (msg.angular.z > 0) gen_pluse(LEFT); // Plus mean CW or left.
+  else gen_pluse(KEEP); // Zero mean keep steer.
    /* move task */
 }
 
@@ -100,7 +96,7 @@ void motorCb(const geometry_msgs::Twist& msg) {
  * @author "Yusuke Doi"
  * @param direction Steer to direction.
  */
-void steer(const char direction) {
+void gen_pluse(const char direction) {
   switch (direction) {
   case LEFT: // Task steer left.
       noTone(cw_plus); // Unset tone. If don't running tone, not happen.
