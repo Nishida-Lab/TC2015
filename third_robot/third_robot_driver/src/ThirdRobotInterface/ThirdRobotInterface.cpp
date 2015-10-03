@@ -472,29 +472,42 @@ void cirkit::ThirdRobotInterface::setOdometry(double new_x, double new_y, double
 // Calculate Third Robot odometry
 void cirkit::ThirdRobotInterface::calculateOdometry()
 {
+  // Pulse to distance
   for(int i = 0; i < 2; i++){
 	delta_dist[i] = (delta_rear_encoder_counts[i]/PulseRate/GeerRate)*(WheelDiameter[i]*M_PI);
   }
 
-  double delta_L = (delta_dist[0] + delta_dist[1])/2.0;
-  double delta_yaw = (delta_dist[0] - delta_dist[1])/TredWidth;
-  double rho = 0;
-  double dist = 0;
+  // double delta_L = (delta_dist[0] + delta_dist[1])/2.0;
+  // double delta_yaw = (delta_dist[0] - delta_dist[1])/TredWidth;
+  // double rho = 0;
+  // double dist = 0;
 
-  if(fabs(delta_yaw) < 1e-3){
-	delta_yaw = 0;
+  odometry_yaw_ += ((last_delta_dist[0] - last_delta_dist[1] + delta_dist[0] - delta_dist[1])/
+					0.7*TredWidth);
+  odometry_x_ += (((last_delta_dist[0] + last_delta_dist[1]) * cos(last_odometry_yaw)
+				   + (delta_dist[0] + delta_dist[1]) * cos(odometry_yaw_)) / 4.0);
+  odometry_y_ += (((last_delta_dist[0] + last_delta_dist[1]) * sin(last_odometry_yaw)
+				   + (delta_dist[0] + delta_dist[1]) * sin(odometry_yaw_)) / 4.0);
+  
+  for(int i = 0; i < 2; i++){
+	last_delta_dist[i] = delta_dist[i];
   }
+  last_odometry_yaw = odometry_yaw_;
 
-  if(delta_yaw == 0.0){
-	odometry_x_ = odometry_x_ + delta_L * cos(odometry_yaw_);
-	odometry_y_ = odometry_y_ + delta_L * sin(odometry_yaw_);
-  }else{
-	rho = delta_L/delta_yaw;
-	dist = 2.0*rho*sin((delta_yaw/2.0));
-	odometry_x_ = odometry_x_ + dist * cos(odometry_yaw_ + (delta_yaw/2.0));
-	odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_ + (delta_yaw/2.0));
-	odometry_yaw_ += delta_yaw;
-  }
+  // if(fabs(delta_yaw) < 1e-3){
+  // 	delta_yaw = 0;
+  // }
+
+  // if(delta_yaw == 0.0){
+  // 	odometry_x_ = odometry_x_ + delta_L * cos(odometry_yaw_);
+  // 	odometry_y_ = odometry_y_ + delta_L * sin(odometry_yaw_);
+  // }else{
+  // 	rho = delta_L/delta_yaw;
+  // 	dist = 2.0*rho*sin((delta_yaw/2.0));
+  // 	odometry_x_ = odometry_x_ + dist * cos(odometry_yaw_ + (delta_yaw/2.0));
+  // 	odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_ + (delta_yaw/2.0));
+  // 	odometry_yaw_ += delta_yaw;
+  // }
   std::cout << "odom_x : " << odometry_x_ << std::endl;
   std::cout << "odom_y : " << odometry_y_ << std::endl;
   std::cout << "odom_t : " << odometry_yaw_ << std::endl;
