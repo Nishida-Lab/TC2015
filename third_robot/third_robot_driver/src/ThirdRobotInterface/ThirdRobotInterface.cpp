@@ -472,7 +472,7 @@ void cirkit::ThirdRobotInterface::setOdometry(double new_x, double new_y, double
 // Calculate Third Robot odometry
 void cirkit::ThirdRobotInterface::calculateOdometry()
 {
-  // Pulse to Rad
+  // Pulse to distance
   for(int i = 0; i < 2; i++){
 	delta_dist[i] = (delta_rear_encoder_counts[i]/PulseRate/GeerRate)*(WheelDiameter[i]*M_PI);
   }
@@ -483,11 +483,11 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
   // double dist = 0;
 
   odometry_yaw_ += ((last_delta_dist[0] - last_delta_dist[1] + delta_dist[0] - delta_dist[1])/
-					4.0*TredWidth);
-  odometry_x_ += ((last_delta_dist[0] + last_delta_dist[1]) * cos(last_odometry_yaw)
-				  + (delta_dist[0] + delta_dist[1]) * cos(odometry_yaw_)) / 4.0;
-  odometry_x_ += ((last_delta_dist[0] + last_delta_dist[1]) * sin(last_odometry_yaw)
-				  + (delta_dist[0] + delta_dist[1]) * sin(odometry_yaw_)) / 4.0;
+					0.7*TredWidth);
+  odometry_x_ += (((last_delta_dist[0] + last_delta_dist[1]) * cos(last_odometry_yaw)
+				   + (delta_dist[0] + delta_dist[1]) * cos(odometry_yaw_)) / 4.0);
+  odometry_y_ += (((last_delta_dist[0] + last_delta_dist[1]) * sin(last_odometry_yaw)
+				   + (delta_dist[0] + delta_dist[1]) * sin(odometry_yaw_)) / 4.0);
   
   for(int i = 0; i < 2; i++){
 	last_delta_dist[i] = delta_dist[i];
