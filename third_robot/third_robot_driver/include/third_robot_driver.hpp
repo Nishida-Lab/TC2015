@@ -46,6 +46,8 @@ namespace cirkit
 	ros::Time current_time_, last_time_;
 
 	boost::mutex access_mutex_;
+
+	int steer_dir_;
   };
   
 }

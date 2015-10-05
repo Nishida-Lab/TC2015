@@ -79,7 +79,6 @@ int cirkit::ThirdRobotInterface::setSerialPort()
 	throw logic_error("Faild to ioctl: URBTC_CONTINUOUS_READ");
   }
  
-
   cmd_ccmd.selout     = SET_SELECT | CH0 | CH1 | CH2 | CH3; // All PWM.
   cmd_ccmd.selin      = SET_SELECT; // All input using for encoder count.
   cmd_ccmd.setoffset  = CH0 | CH1 | CH2 | CH3;
@@ -139,13 +138,14 @@ int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed
 	  return driveDirect(front_angle_deg, rear_speed_m_s);
 	}
   }else{
-	front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
+	// front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
+	front_angle_deg = ((atan2((WHEELBASE_LENGTH*angular_speed),linear_speed))*(180/M_PI));
 	//cout << "front_angle_deg : " << front_angle_deg << endl;
   }
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
 
-  cout << front_angle_deg << rear_speed_m_s << endl;
+  cout << "front_angle_deg : " << front_angle_deg << " rear_speed_ms : " << rear_speed_m_s << endl;
 
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
@@ -197,7 +197,7 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 	  //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
 	  cmd_ccmd.offset[1] = (int)(duty);
-	  cout << "duty :" << duty << endl;
+	  //cout << "duty :" << duty << endl;
 	  runmode = FORWARD_MODE;
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
@@ -272,11 +272,13 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	}
 
   double angdiff = (input_angle - steer_angle);
-
+  cout << "steer_angle: " << steer_angle << endl;
+  cout << "input_angle: " << input_angle << endl;
+  cout << "angdiff: " << angdiff << endl;
   if(angdiff > 0){
-	return -1;
-  }else if(angdiff < 0){
 	return 1;
+  }else if(angdiff < 0){
+	return -1;
   }else{
 	return 0;
   }
@@ -420,10 +422,10 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
   last_odometry_yaw = odometry_yaw_;
 
   
-  std::cout << "odom_x : " << odometry_x_ << std::endl;
-  std::cout << "odom_y : " << odometry_y_ << std::endl;
-  std::cout << "odom_t : " << odometry_yaw_ << std::endl;
-  std::cout << "----------" << std::endl;
+  // std::cout << "odom_x : " << odometry_x_ << std::endl;
+  // std::cout << "odom_y : " << odometry_y_ << std::endl;
+  // std::cout << "odom_t : " << odometry_yaw_ << std::endl;
+  // std::cout << "----------" << std::endl;
 }
 
 

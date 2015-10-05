@@ -84,8 +84,8 @@ void loop() {
  * @param msg This param is msg object of the motor_driver topic.
  */
 void steerCb(const geometry_msgs::Twist& msg) {
-  if (msg.angular.z < 0) gen_pluse(RIGHT); // Minus mean CCW or right.
-  else if (msg.angular.z > 0) gen_pluse(LEFT); // Plus mean CW or left.
+  if (msg.angular.z < 0) gen_pluse(LEFT); // Minus mean CCW or right.
+  else if (msg.angular.z > 0) gen_pluse(RIGHT); // Plus mean CW or left.
   else gen_pluse(KEEP); // Zero mean keep steer.
    /* move task */
 }
@@ -100,15 +100,16 @@ void gen_pluse(const char direction) {
   switch (direction) {
   case LEFT: // Task steer left.
       noTone(cw_plus); // Unset tone. If don't running tone, not happen.
-      tone(ccw_plus, PULSE_FREQUENCY); // Write pulse to CCW pin. turn to CW.
+      tone(ccw_plus, PULSE_FREQUENCY, 200); // Write pulse to CCW pin. turn to CW.
       break;
   case RIGHT: // Task steer right.
       noTone(ccw_plus); // Unset tone. If don't running tone, not happen.
-      tone(cw_plus, PULSE_FREQUENCY); // Write pulse to CW pin. turn to CCW.
+      tone(cw_plus, PULSE_FREQUENCY, 200); // Write pulse to CW pin. turn to CCW.
       break;
   case KEEP: default: // set CW and CCW to low.
       noTone(cw_plus); // Unset tone. If don't running tone, not happen.
       noTone(ccw_plus); // Unset tone. If don't running tone, not happen.
+      break;
   }
 }
 
