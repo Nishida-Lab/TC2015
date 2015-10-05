@@ -52,7 +52,7 @@ const int ccw_plus = 5;
 const int ccw_minus = 6;
 
 /* Declare proto type functions. */
-void gen_pulse(const char direction); // Write pulse to the stepping motor.
+void gen_pulse(const char direction, double time); // Write pulse to the stepping motor.
 void steerCb(const geometry_msgs::Twist& msg); // Call back function of the motor_driver topic.
 
 /* Declare global constants. */
@@ -84,9 +84,10 @@ void loop() {
  * @param msg This param is msg object of the motor_driver topic.
  */
 void steerCb(const geometry_msgs::Twist& msg) {
-  if (msg.angular.z < 0) gen_pluse(LEFT); // Minus mean CCW or right.
-  else if (msg.angular.z > 0) gen_pluse(RIGHT); // Plus mean CW or left.
-  else gen_pluse(KEEP); // Zero mean keep steer.
+  int time = msg.angular.x * 10;
+  if (msg.angular.z < 0 && time > 50) gen_pluse(LEFT, time); // Minus mean CCW or right.
+  else if (msg.angular.z > 0 && time > 50) gen_pluse(RIGHT, time); // Plus mean CW or left.
+  else gen_pluse(KEEP, 0); // Zero mean keep steer.
    /* move task */
 }
 
@@ -96,15 +97,15 @@ void steerCb(const geometry_msgs::Twist& msg) {
  * @author "Yusuke Doi"
  * @param direction Steer to direction.
  */
-void gen_pluse(const char direction) {
+void gen_pluse(const char direction, double time) {
   switch (direction) {
   case LEFT: // Task steer left.
       noTone(cw_plus); // Unset tone. If don't running tone, not happen.
-      tone(ccw_plus, PULSE_FREQUENCY, 200); // Write pulse to CCW pin. turn to CW.
+      tone(ccw_plus, PULSE_FREQUENCY, time); // Write pulse to CCW pin. turn to CW.
       break;
   case RIGHT: // Task steer right.
       noTone(ccw_plus); // Unset tone. If don't running tone, not happen.
-      tone(cw_plus, PULSE_FREQUENCY, 200); // Write pulse to CW pin. turn to CCW.
+      tone(cw_plus, PULSE_FREQUENCY, time); // Write pulse to CW pin. turn to CCW.
       break;
   case KEEP: default: // set CW and CCW to low.
       noTone(cw_plus); // Unset tone. If don't running tone, not happen.

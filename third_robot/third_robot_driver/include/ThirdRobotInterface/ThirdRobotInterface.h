@@ -23,6 +23,10 @@
 #include "imcs01_driver/driver/urbtc.h"
 #include "imcs01_driver/driver/urobotc.h"
 
+
+#include "ros/ros.h"
+#include <geometry_msgs/Twist.h>		// cmd_ve
+
 #define FRONT	0
 #define REAR	1
 
@@ -87,10 +91,10 @@ namespace cirkit
     virtual int closeSerialPort();
 
     //! Drive
-    virtual int drive(double linear_speed, double angular_speed);
+    virtual geometry_msgs::Twist drive(double linear_speed, double angular_speed);
 
     //! Drive direct
-    virtual int driveDirect(double front_angular, double rear_speed);// front_angular in [deg]
+    virtual geometry_msgs::Twist driveDirect(double front_angular, double rear_speed);// front_angular in [deg]
 
     //! Read the encoder pulses from iMCs01
     virtual int getEncoderPacket();

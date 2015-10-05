@@ -37,9 +37,6 @@ void cirkit::ThirdRobotDriver::run()
   double last_x, last_y, last_yaw;
   double vel_x, vel_y, vel_yaw;
   double dt;
-  geometry_msgs::Twist steer_value;
-  steer_value.angular.z = steer;
-  steer_pub_.publish(steer_value);
 
   init();
 
@@ -110,7 +107,9 @@ void cirkit::ThirdRobotDriver::cmdVelReceived(const geometry_msgs::Twist::ConstP
   static int steer = 0;
   {
 	boost::mutex::scoped_lock(access_mutex_);
+	cout << "cmdreived.x :" << cmd_vel->linear.x << endl;
 	steer_dir_ = thirdrobot_->drive(cmd_vel->linear.x, cmd_vel->angular.z);
   }
+  steer_pub_.publish(steer_dir_);
 
 }

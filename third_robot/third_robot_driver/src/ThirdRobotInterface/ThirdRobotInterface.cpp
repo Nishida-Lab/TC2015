@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include "ros/ros.h"
-
+#include <geometry_msgs/Twist.h>		// cmd_vel
 #include "ThirdRobotInterface/ThirdRobotInterface.h"
 
 using namespace std;
@@ -126,7 +126,7 @@ int cirkit::ThirdRobotInterface::closeSerialPort()
 // Set the speeds
 //   linear_speed  : target linear speed[m/s]
 //   angular_speed : target angular speed[rad/s]
-int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed)
+geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed)
 {
   // Front angle in deg.
   double front_angle_deg = 0;
@@ -145,7 +145,7 @@ int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
 
-  cout << "front_angle_deg : " << front_angle_deg << " rear_speed_ms : " << rear_speed_m_s << endl;
+  cout <<  " target_rear_speed_ms : " << rear_speed_m_s << endl;
 
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
@@ -163,7 +163,7 @@ int cirkit::ThirdRobotInterface::drive(double linear_speed, double angular_speed
 //     ROBOT_STASIS_BACK_STOP    : Stoping but back mode
 //     ROBOT_STASIS_OTHERWISE    : Braking but not stop.
 
-int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_speed)
+geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_speed)
 {
   static int forward_stop_cnt = 0;
   static int back_stop_cnt = 0;
@@ -176,7 +176,7 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
   static double e2 = 0;
 
   static double gain_p = 10000.0;
-  static double gain_i = 10000.0;
+  static double gain_i = 60000.0;
   static double gain_d = 1000.0;
 
   double duty = 0;
@@ -185,11 +185,11 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
 	if(stasis_ == ROBOT_STASIS_FORWARD || stasis_ == ROBOT_STASIS_FORWARD_STOP){ // Now Forwarding
 	  e = rear_speed_m_s - linear_velocity;
-	  //cout << "e:" << e << endl;
+	  cout << "linear_v : " << linear_velocity << endl;
+	  cout << "e:" << e << endl;
 	  u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
 		- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
 
-	  //cout << "test-2:" << u << endl;
 	  if(rear_speed == 0.0){ u = 32767; }
 	  duty = MIN(u, 60000);
 	  duty = MAX(duty, 32767);
@@ -197,10 +197,14 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 	  //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
 	  cmd_ccmd.offset[1] = (int)(duty);
-	  //cout << "duty :" << duty << endl;
+	  cout << "duty :" << duty << endl;
 	  runmode = FORWARD_MODE;
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
+		ROS_WARN("URBTC_COUNTER_SET fail.");
+	  }
+	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ 
+		ROS_WARN("imcs01 write fail.");
+	  }
 	  stasis_ = ROBOT_STASIS_FORWARD;
 	  //cout << "test1:" << cmd_ccmd.offset[1] << endl;
 	}else{ // Now Backing
@@ -212,8 +216,12 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	  duty = u;
 	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
 
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); } // error
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
+		ROS_WARN("URBTC_COUNTER_SET fail.");
+	  } // error
+	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ 
+		ROS_WARN("imcs01 write fail.");
+	  }
 	  //cout <<  "test2" << cmd_ccmd.offset[1] << endl;
 	  if(forward_stop_cnt >= 20){
 		stasis_ = ROBOT_STASIS_FORWARD_STOP;
@@ -233,16 +241,24 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	  duty = MIN(u, 62176);
 	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
 
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1); }
+	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
+		ROS_WARN("URBTC_COUNTER_SET fail.");
+	  }
+	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
+		ROS_WARN("imcs01 write fail.");
+	  }
 	  //cout <<  "test3" << cmd_ccmd.offset[1] << endl;
 	  stasis_ = ROBOT_STASIS_BACK;
 	}else{ // Now forwarding
 	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
 	  cmd_ccmd.offset[1] = 32767; // STOP
 	  runmode = BACK_STOP_MODE;
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){ return (-1); }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ return (-1);}
+	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
+		ROS_WARN("URBTC_COUNTER_SET fail.");
+	  }
+	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
+		ROS_WARN("imcs01 write fail.");
+	  }
 	  //	  cout <<  "test4" << cmd_ccmd.offset[1] << endl;
 	  if(back_stop_cnt >= 20){
 		stasis_ = ROBOT_STASIS_BACK_STOP;
@@ -272,15 +288,22 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
 	}
 
   double angdiff = (input_angle - steer_angle);
-  cout << "steer_angle: " << steer_angle << endl;
-  cout << "input_angle: " << input_angle << endl;
-  cout << "angdiff: " << angdiff << endl;
+  // cout << "steer_angle: " << steer_angle << endl;
+  // cout << "input_angle: " << input_angle << endl;
+  // cout << "angdiff: " << angdiff << endl;
+  geometry_msgs::Twist ret_steer;
   if(angdiff > 0){
-	return 1;
+	ret_steer.angular.z = 1;
+	ret_steer.angular.x = fabs(angdiff);
+	return ret_steer;
   }else if(angdiff < 0){
-	return -1;
+	ret_steer.angular.z = -1;
+	ret_steer.angular.x = fabs(angdiff);
+	return ret_steer;
   }else{
-	return 0;
+	ret_steer.angular.z = 0;
+	ret_steer.angular.x = 0;
+	return ret_steer;
   }
 
 }
@@ -404,6 +427,8 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
 	delta_dist[i] = (delta_rear_encoder_counts[i]/PulseRate/GeerRate)*(WheelDiameter[i]*M_PI);
   }
 
+  linear_velocity = (delta_dist[0] + delta_dist[1])/2.0;
+  linear_velocity = linear_velocity / delta_rear_encoder_time;
   // double delta_L = (delta_dist[0] + delta_dist[1])/2.0;
   // double delta_yaw = (delta_dist[0] - delta_dist[1])/TredWidth;
   // double rho = 0;

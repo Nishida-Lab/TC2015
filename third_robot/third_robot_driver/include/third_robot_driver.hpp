@@ -47,7 +47,7 @@ namespace cirkit
 
 	boost::mutex access_mutex_;
 
-	int steer_dir_;
+	geometry_msgs::Twist steer_dir_;
   };
   
 }
