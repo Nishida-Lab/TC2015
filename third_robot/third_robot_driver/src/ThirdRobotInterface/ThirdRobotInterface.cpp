@@ -15,16 +15,11 @@
 using namespace std;
 
 cirkit::ThirdRobotInterface::ThirdRobotInterface(
-						 std::string new_serial_port_imcs01, int new_baudrate_imcs01,
-						 std::string new_serial_port_arduino, int new_baudrate_arduino)
+						 std::string new_serial_port_imcs01, int new_baudrate_imcs01)
 {
   imcs01_port_name = new_serial_port_imcs01;
   fd_imcs01 = -1;
   baudrate_imcs01 = new_baudrate_imcs01;
-
-  arduino_port_name = new_serial_port_arduino;
-  fd_arduino = -1;
-  baudrate_arduino = new_baudrate_arduino;
 
   for(int i = 0; i < 2; i++){
 	delta_rear_encoder_counts[i] = -1;
@@ -37,7 +32,6 @@ cirkit::ThirdRobotInterface::ThirdRobotInterface(
   stasis_ = ROBOT_STASIS_FORWARD_STOP;
 
   resetOdometry();
-
 }
 
 cirkit::ThirdRobotInterface::~ThirdRobotInterface()
@@ -54,13 +48,6 @@ cirkit::ThirdRobotInterface::~ThirdRobotInterface()
     close(fd_imcs01);
   }
   fd_imcs01 = -1;
-
-  //! Arduino
-  if(fd_arduino > 0){
-    tcsetattr(fd_arduino, TCSANOW, &oldtio_arduino);
-    close(fd_arduino);
-  }
-  fd_arduino = -1;
 }
 
 // *****************************************************************************
@@ -91,9 +78,7 @@ int cirkit::ThirdRobotInterface::setSerialPort()
   if(ioctl(fd_imcs01, URBTC_CONTINUOUS_READ) < 0){
 	throw logic_error("Faild to ioctl: URBTC_CONTINUOUS_READ");
   }
-  // if(ioctl(fd_imcs01, URBTC_BUFREAD) < 0){
-  // 	throw logic_error("Faild to ioctl: URBTC_CONTINUOUS_READ");
-  // }
+ 
 
   cmd_ccmd.selout     = SET_SELECT | CH0 | CH1 | CH2 | CH3; // All PWM.
   cmd_ccmd.selin      = SET_SELECT; // All input using for encoder count.
@@ -103,7 +88,6 @@ int cirkit::ThirdRobotInterface::setSerialPort()
   cmd_ccmd.offset[2]  = 58981;
   cmd_ccmd.offset[3]  = 58981;	// 1/2
   cmd_ccmd.setcounter = CH0 | CH1 | CH2 | CH3;
-  // cmd_ccmd.counter[1] = 29134;	//32767-67[deg]*(1453/27), initialize.
   cmd_ccmd.counter[1] = -3633;	//-67[deg]*(1453/27), initialize.
   cmd_ccmd.counter[2] = 0;
   cmd_ccmd.posneg     = SET_POSNEG | CH0 | CH1 | CH2 | CH3; //POS PWM out.
@@ -118,55 +102,8 @@ int cirkit::ThirdRobotInterface::setSerialPort()
   }
 
   cmd_ccmd.setcounter = 0;
-  // if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
-  // 	throw logic_error("Faild to write");
-  // }
-  // for(int i = 0; i < 4; i++){
-  // 	cmd_uout.ch[i].x   = 0;
-  // 	cmd_uout.ch[i].d   = 0;
-  // 	cmd_uout.ch[i].kp  = 0;
-  // 	cmd_uout.ch[i].kpx = 1;
-  // 	cmd_uout.ch[i].kd  = 0;
-  // 	cmd_uout.ch[i].kdx = 1;
-  // 	cmd_uout.ch[i].ki  = 0;
-  // 	cmd_uout.ch[i].kix = 1;
-  // }
-  // if(ioctl(fd_imcs01, URBTC_DESIRE_SET) < 0){
-  // 	throw logic_error("Faild to ioctl: URBTC_DESIRE_SET");
-  // }
-  // if(write(fd_imcs01, &cmd_uout, sizeof(cmd_uout)) < 0){
-  // 	throw logic_error("Faild to write");
-  // }
+  
   cout << "ThirdRobotInterface (iMCs01)Connected to : " << imcs01_port_name << endl;
-
-  // Arudino
-  if(fd_arduino > 0){
-	throw logic_error("Arduino is already open");
-  }
-  fd_arduino = open(arduino_port_name.c_str(), O_RDWR);
-  if(fd_arduino > 0){
-	tcgetattr(fd_arduino, &oldtio_arduino);
-  }else{
-	throw logic_error("Faild to open port: Arduino");
-  }
-  //Get old serial settings of Arduino
-  //ioctl(m_fd, TCGETS, &m_oldtio);
-  if(tcgetattr(fd_arduino, &newtio_arduino) < 0){
-	throw logic_error("Faild to tcgetattr() : Arduino");
-  }
-  cfsetispeed(&newtio_arduino, baudrate_arduino);
-  cfsetospeed(&newtio_arduino, baudrate_arduino);
-
-  //New serial settings of Arduino
-  newtio_arduino.c_cflag = (baudrate_arduino | CS8 | CREAD | CLOCAL);
-  newtio_arduino.c_iflag = (IGNPAR | ICRNL);
-  newtio_arduino.c_oflag = 0;
-  newtio_arduino.c_lflag = ~ICANON;
-
-  //Set new serial settings of Arduino
-  if( tcsetattr(fd_arduino, TCSANOW, &newtio_arduino) < 0) {
-	throw logic_error("Faild to tcsetattr() : Arduino");
-  }
   return 0;
 }
 
@@ -176,19 +113,13 @@ int cirkit::ThirdRobotInterface::closeSerialPort()
 {
   drive(0.0, 0.0);
   usleep(1000);
-  sendOpcode('0'); // Stop stepping motor;
-  usleep(1000);
 
   if(fd_imcs01 > 0){
     tcsetattr(fd_imcs01, TCSANOW, &oldtio_imcs01);
     close(fd_imcs01);
     fd_imcs01 = -1;
   }
-  if(fd_arduino > 0){
-    tcsetattr(fd_arduino, TCSANOW, &oldtio_arduino);
-    close(fd_arduino);
-    fd_arduino = -1;
-  }
+ 
   return 0;
 }
 
@@ -327,22 +258,29 @@ int cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_s
   // front_angular	: target angle[deg];
   // steer_angle	: now angle[deg];
   double input_angle = 0;
-  if(front_angular >= 45.0){      input_angle = 45.0;
-  }else if(front_angular <= -45){ input_angle = -45.0;
-  }else{                          input_angle = (double)front_angular;
-  }
+  if(front_angular >= 45.0)
+	{
+      input_angle = 45.0;
+	}
+  else if(front_angular <= -45)
+	{ 
+	  input_angle = -45.0;
+	}
+  else
+	{
+	  input_angle = (double)front_angular;
+	}
 
   double angdiff = (input_angle - steer_angle);
 
   if(angdiff > 0){
-	sendOpcode('-'); // Left;
+	return -1;
   }else if(angdiff < 0){
-	sendOpcode('+'); // Right;
+	return 1;
   }else{
-	sendOpcode('0'); // Stop;
+	return 0;
   }
-  //  sendOpcode('0');
-  return 0;
+
 }
 
 // *****************************************************************************
@@ -437,19 +375,6 @@ int cirkit::ThirdRobotInterface::parseRearEncoderCounts()
   return 0;
 }
 
-// *****************************************************************************
-// Send stepping motor operating code to Arduino
-int cirkit::ThirdRobotInterface::sendOpcode(const char code)
-{
-    if(code == '+' || code == '-' ||  code == '0'){
-        sprintf(sendPacket, "$SP,%c;", code);
-        while(write(fd_arduino, sendPacket, SENDSIZE) != SENDSIZE);
-        return 0;
-    }
-    else{
-        return -1; //command misstake
-    } 
-}
 
 // *****************************************************************************
 // Reset Third Robot odometry
@@ -494,20 +419,7 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
   }
   last_odometry_yaw = odometry_yaw_;
 
-  // if(fabs(delta_yaw) < 1e-3){
-  // 	delta_yaw = 0;
-  // }
-
-  // if(delta_yaw == 0.0){
-  // 	odometry_x_ = odometry_x_ + delta_L * cos(odometry_yaw_);
-  // 	odometry_y_ = odometry_y_ + delta_L * sin(odometry_yaw_);
-  // }else{
-  // 	rho = delta_L/delta_yaw;
-  // 	dist = 2.0*rho*sin((delta_yaw/2.0));
-  // 	odometry_x_ = odometry_x_ + dist * cos(odometry_yaw_ + (delta_yaw/2.0));
-  // 	odometry_y_ = odometry_y_ + dist * sin(odometry_yaw_ + (delta_yaw/2.0));
-  // 	odometry_yaw_ += delta_yaw;
-  // }
+  
   std::cout << "odom_x : " << odometry_x_ << std::endl;
   std::cout << "odom_y : " << odometry_y_ << std::endl;
   std::cout << "odom_t : " << odometry_yaw_ << std::endl;

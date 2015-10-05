@@ -112,27 +112,19 @@ include_directories(
 
 ## Declare a cpp executable
 add_executable(third_robot_driver_node 
-  src/third_robot_driver.cpp 
+  src/third_robot_driver_node.cpp
+  src/third_robot_driver.cpp
   src/ThirdRobotInterface/ThirdRobotInterface.cpp
 )
 
-add_executable(third_robot_driver_radio_node
-  src/radio_class.cpp
-  src/third_robot_driver_radio.cpp 
-)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(third_robot_driver_node third_robot_driver_generate_messages_cpp)
 
-add_dependencies(third_robot_driver_radio_node third_robot_driver_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(third_robot_driver_node
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(third_robot_driver_radio_node
   ${catkin_LIBRARIES}
 )
 

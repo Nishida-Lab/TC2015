@@ -72,8 +72,7 @@ namespace cirkit
   {
   public:
     //! Constructor
-    ThirdRobotInterface(std::string new_serial_port_imcs01, int new_baudrate_imcs01,
-						std::string new_serial_port_arduino, int new_baudrate_arduino);
+    ThirdRobotInterface(std::string new_serial_port_imcs01, int new_baudrate_imcs01);
 
     //! Destructor
     ~ThirdRobotInterface();
@@ -104,9 +103,6 @@ namespace cirkit
 
     //! Set new odometry.
     virtual void setOdometry(double new_x, double new_y, double new_yaw);
-
-    //! Send stepping motor operating code to Arduino
-    int sendOpcode(const char code);
 
 
     //! robot odometry x[m]
@@ -143,21 +139,16 @@ namespace cirkit
 
     //! Serial port to which the robot is connected
     std::string imcs01_port_name;
-    std::string arduino_port_name;
 
     //! File descriptor
     int fd_imcs01;
-    int fd_arduino;
 
     //! Baudrate
     int baudrate_imcs01;
-    int baudrate_arduino;
 
     //! Old and new termios struct
     termios oldtio_imcs01;
     termios newtio_imcs01;
-    termios oldtio_arduino;
-    termios newtio_arduino;
 
     //! Delta rear encoder counts. 
 	//! 0 is right, 1 is left.
@@ -194,9 +185,6 @@ namespace cirkit
 
 	//! Linear velocity
 	double linear_velocity;
-
-    //! Send packet data to Arduino.
-    char sendPacket[SENDSIZE];
 
 	//! Forward or Back mode flag
 	int runmode;
