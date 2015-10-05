@@ -6,7 +6,7 @@ cirkit::ThirdRobotDriver::ThirdRobotDriver(ros::NodeHandle nh)
   : nh_(nh), rate_(20)
 {
   ros::NodeHandle n("~");
-  n.param<std::string>("thirdrobot/imcs01_port", imcs01_port_, "/dev/urbtc0");
+  n.param<std::string>("imcs01_port", imcs01_port_, "/dev/urbtc0");
   
   thirdrobot_ = new cirkit::ThirdRobotInterface(imcs01_port_, 0);
   
