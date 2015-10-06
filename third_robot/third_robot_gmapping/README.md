@@ -46,6 +46,13 @@ $ rosparam set use_sim_time true
 $ rosrun gmapping slam_gmapping scan:=base_scan
 ```
 
+上記は最も単純で、ロボットそれぞれに対してパラメータを適切に設定することでより綺麗な地図が作成できる。細かい設定パラメータはwikiを参照。
+3号機では以下のようにすると大体うまく行きます。
+
+```bash
+$ rosrun gmapping slam_gmapping scan:=base_scan _particles:=30 _delta:=0.1 _maxUrange:=30.0 _lstep:=0.01 _astep:=0.01 _stt:=0.25 _minimumScore:=50
+```
+
 バグファイルを再生させる。
 
 ```bash
