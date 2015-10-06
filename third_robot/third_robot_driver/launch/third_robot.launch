@@ -2,7 +2,7 @@
 
   <node name="third_robot_driver_node" pkg="third_robot_driver" type="third_robot_driver_node" 
 		output="screen">
-    <param name="imcs01_port" type="string" value="/dev/urbtc0" />
+    <param name="imcs01_port" type="string" value="/dev/urbtc1" />
   </node>
   
   <node name="rossrial_python" pkg="rosserial_python" type="serial_node.py"

@@ -108,6 +108,7 @@ void cirkit::ThirdRobotDriver::cmdVelReceived(const geometry_msgs::Twist::ConstP
   {
 	boost::mutex::scoped_lock(access_mutex_);
 	cout << "cmdreived.x :" << cmd_vel->linear.x << endl;
+	cout << "cmdreived.z :" << cmd_vel->angular.z << endl;
 	steer_dir_ = thirdrobot_->drive(cmd_vel->linear.x, cmd_vel->angular.z);
   }
   steer_pub_.publish(steer_dir_);

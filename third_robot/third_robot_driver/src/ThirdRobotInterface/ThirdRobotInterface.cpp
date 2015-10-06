@@ -139,8 +139,9 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
 	}
   }else{
 	// front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
-	front_angle_deg = ((atan2((WHEELBASE_LENGTH*angular_speed),linear_speed))*(180/M_PI));
-	//cout << "front_angle_deg : " << front_angle_deg << endl;
+	//front_angle_deg = ((atan2((WHEELBASE_LENGTH*angular_speed),linear_speed))*(180/M_PI));
+	front_angle_deg = angular_speed*(180.0/M_PI);
+	cout << "front_angle_deg : " << front_angle_deg << endl;
   }
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
@@ -176,7 +177,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
   static double e2 = 0;
 
   static double gain_p = 10000.0;
-  static double gain_i = 60000.0;
+  static double gain_i = 10000.0;
   static double gain_d = 1000.0;
 
   double duty = 0;
@@ -185,8 +186,8 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
 	if(stasis_ == ROBOT_STASIS_FORWARD || stasis_ == ROBOT_STASIS_FORWARD_STOP){ // Now Forwarding
 	  e = rear_speed_m_s - linear_velocity;
-	  cout << "linear_v : " << linear_velocity << endl;
-	  cout << "e:" << e << endl;
+	  //cout << "linear_v : " << linear_velocity << endl;
+	  //cout << "e:" << e << endl;
 	  u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
 		- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
 
@@ -197,7 +198,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 	  //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
 	  cmd_ccmd.offset[1] = (int)(duty);
-	  cout << "duty :" << duty << endl;
+	  //cout << "duty :" << duty << endl;
 	  runmode = FORWARD_MODE;
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
 		ROS_WARN("URBTC_COUNTER_SET fail.");
@@ -288,9 +289,9 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	}
 
   double angdiff = (input_angle - steer_angle);
-  // cout << "steer_angle: " << steer_angle << endl;
-  // cout << "input_angle: " << input_angle << endl;
-  // cout << "angdiff: " << angdiff << endl;
+  cout << "steer_angle: " << steer_angle << endl;
+  cout << "input_angle: " << input_angle << endl;
+  cout << "angdiff: " << angdiff << endl;
   geometry_msgs::Twist ret_steer;
   if(angdiff > 0){
 	ret_steer.angular.z = 1;
