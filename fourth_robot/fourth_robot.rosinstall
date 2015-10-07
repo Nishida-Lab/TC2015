@@ -1,0 +1,4 @@
+- git:
+    local-name: fourth_robot/gim30
+    uri: https://github.com/RyodoTanaka/gim30.git
+    version: master
