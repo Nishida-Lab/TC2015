@@ -174,10 +174,7 @@ include_directories(
 add_executable(third_robot_send_goals src/third_robot_send_goals.cpp)
 target_link_libraries(third_robot_send_goals ${catkin_LIBRARIES})
 
-<<<<<<< HEAD
 add_executable(third_robot_waypoints_saver src/third_robot_waypoints_saver.cpp)
 target_link_libraries(third_robot_waypoints_saver ${catkin_LIBRARIES})
-=======
 add_executable(third_robot_send_goals_and_detect src/third_robot_send_goals_and_detect.cpp)
 target_link_libraries(third_robot_send_goals_and_detect ${catkin_LIBRARIES})
->>>>>>> fix-third-robot-2dnav
