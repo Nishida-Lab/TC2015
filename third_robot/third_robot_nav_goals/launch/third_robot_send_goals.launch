@@ -13,7 +13,7 @@
 	<!-- Tsukuba Challenge 2014 -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/tukutyare141110-2.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/tukutyare141110-7.csv" /> -->
-    <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/fullmap3.csv" />
+    <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/ctrl_building.csv" />
 
 	<!-- Tukuba Kenshu Center -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/kenshu_center.csv" /> -->
