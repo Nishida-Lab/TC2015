@@ -1,6 +1,7 @@
 #include <ros/ros.h>
+#include <ros/package.h>
 #include "third_robot_sound/sound_service.h"
-#include "/home/yuta/catkin_ws/src/rospeex/rospeex_if/src/cpp/rospeex_if/rospeex.cpp"
+#include "rospeex_if/rospeex.h"
 
 static rospeex::Interface interface;
 
@@ -12,10 +13,10 @@ bool play(third_robot_sound::sound_service::Request  &req,
 	if (req.situation == "start") {
 		res.action = req.situation + " [Now Playing !] ";
 		ROS_INFO("sending back response: %s",res.action.c_str());
-		interface.playSound("/home/yuta/catkin_ws/src/sound/wav/hello.wav");
+		interface.playSound(ros::package::getPath("third_robot_sound")+"/sound/wav/hello.wav");
 	} else {
 		ROS_INFO("No such file or directory !");
-		interface.playSound("/home/yuta/catkin_ws/src/sound/wav/No_such_file.wav");
+		interface.playSound(ros::package::getPath("third_robot_sound")+"/sound/wav/No_such_file.wav");
 	}
 	
 	return true;
