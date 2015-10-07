@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospeex_msgs
   rospeex_if
   roslib
+  interactive_markers
+  visualization_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -168,5 +171,7 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 add_executable(third_robot_send_goals src/third_robot_send_goals.cpp)
-
 target_link_libraries(third_robot_send_goals ${catkin_LIBRARIES})
+
+add_executable(third_robot_waypoints_saver src/third_robot_waypoints_saver.cpp)
+target_link_libraries(third_robot_waypoints_saver ${catkin_LIBRARIES})
