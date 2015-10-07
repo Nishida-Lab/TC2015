@@ -45,7 +45,7 @@ public:
 
 	ros::NodeHandle n("~");
 	n.param<std::string>("waypointsfile", filename, 
-						 "/home/ryodo/Documents/Kyutech/CIR-KIT/catkin_ws/src/third_robot_nav_goals/monotsukuri150206-01.csv");
+						 ros::package::getPath("third_robot_nav_goals") + "/waypoints/default.csv");
 	n.param("start_target_num", target_num, 0);
 	ROS_INFO("[Start target num] : %d", target_num);
 	ROS_INFO("[Waypoints file name] : %s", filename.c_str());

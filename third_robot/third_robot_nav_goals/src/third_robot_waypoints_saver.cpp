@@ -193,7 +193,7 @@ public:
     ros::NodeHandle n("~");
 
     n.param<std::string>("savewaypointsfile", savefilename,
-			 ros::package::getPath("third_robot_navs_goals") + "/waypoints/default.csv");
+			 ros::package::getPath("third_robot_nav_goals") + "/waypoints/default.csv");
     ROS_INFO("[Save waypoints file name] : %s", savefilename.c_str());
     readExistGoals();
 
