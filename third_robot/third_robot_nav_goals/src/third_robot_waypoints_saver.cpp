@@ -36,6 +36,8 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
 
+#include <ros/package.h>
+
 #include <math.h>
 #include <string>
 #include <iostream>
@@ -188,18 +190,10 @@ public:
 
     server.reset( new interactive_markers::InteractiveMarkerServer("basic_controls","",false) );
 
-    //    ros::Duration(0.1).sleep();
-
-    // menu_handler.insert( "First Entry", &processFeedback );
-    // menu_handler.insert( "Second Entry", &processFeedback );
-    // interactive_markers::MenuHandler::EntryHandle sub_menu_handle = menu_handler.insert( "Submenu" );
-    // menu_handler.insert( sub_menu_handle, "First Entry", &processFeedback );
-    // menu_handler.insert( sub_menu_handle, "Second Entry", &processFeedback );
-
     ros::NodeHandle n("~");
 
     n.param<std::string>("savewaypointsfile", savefilename,
-			 "/home/ryodo/Documents/Kyutech/CIR-KIT/ROS/catkin_ws/src/third_robot_nav_goals/waypoints/monotsukuri141031.csv");
+			 ros::package::getPath("third_robot_navs_goals") + "/waypoints/default.csv");
     ROS_INFO("[Save waypoints file name] : %s", savefilename.c_str());
     readExistGoals();
 
