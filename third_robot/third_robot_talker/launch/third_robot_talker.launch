@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg="third_robot_talker" 
+		type="third_robot_talker" 
+		name="third_robot_talker"
+		output="screen">
+    <param name="wavfilepath" value="$(find third_robot_talker)/wav/" />
+  </node>
+
+</launch>
