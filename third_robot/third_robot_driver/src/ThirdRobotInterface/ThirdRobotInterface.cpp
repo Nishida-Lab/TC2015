@@ -15,7 +15,7 @@
 using namespace std;
 
 cirkit::ThirdRobotInterface::ThirdRobotInterface(
-						 std::string new_serial_port_imcs01, int new_baudrate_imcs01)
+												 std::string new_serial_port_imcs01, int new_baudrate_imcs01)
 {
   imcs01_port_name = new_serial_port_imcs01;
   fd_imcs01 = -1;
@@ -106,6 +106,26 @@ int cirkit::ThirdRobotInterface::setSerialPort()
   return 0;
 }
 
+// *****************************************************************************
+// Set params
+void cirkit::ThirdRobotInterface::setParams(double pulse_rate, double geer_rate, double wheel_diameter_right, double wheel_diameter_left, double tred_width)
+{
+  	//! num of pulse
+	PulseRate = pulse_rate;
+	ROS_INFO("PulseRate : %lf", PulseRate);
+	//! GEER_RATE
+	GeerRate = geer_rate;
+	ROS_INFO("GeerRate : %lf", GeerRate);
+	//! Wheel Diameter[m]
+	WheelDiameter[0] = wheel_diameter_right; // left
+	WheelDiameter[1] = wheel_diameter_left;
+	ROS_INFO("wheelDiameter[right] : %lf", WheelDiameter[0]);
+	ROS_INFO("wheelDiameter[left]  : %lf", WheelDiameter[1]);
+
+	//! Tred width[m]
+	TredWidth = tred_width;
+	ROS_INFO("TredWidth : %lf", TredWidth);
+}
 // *****************************************************************************
 // Close the serial port
 int cirkit::ThirdRobotInterface::closeSerialPort()

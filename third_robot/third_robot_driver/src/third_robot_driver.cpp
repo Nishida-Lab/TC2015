@@ -7,9 +7,20 @@ cirkit::ThirdRobotDriver::ThirdRobotDriver(ros::NodeHandle nh)
 {
   ros::NodeHandle n("~");
   n.param<std::string>("imcs01_port", imcs01_port_, "/dev/urbtc0");
-  
+  double pulse_rate = 0;
+  double geer_rate = 0;
+  double wheel_diameter_right = 0;
+  double wheel_diameter_left = 0;
+  double tred_width = 0;
+  n.param("pulse_rate", pulse_rate, 40.0);
+  n.param("geer_rate", geer_rate, 33.0);
+  n.param("wheel_diameter_right", wheel_diameter_right, 0.275);
+  n.param("wheel_diameter_left", wheel_diameter_left, 0.275);
+  n.param("tred_width", tred_width, 0.595);
+
   thirdrobot_ = new cirkit::ThirdRobotInterface(imcs01_port_, 0);
-  
+  thirdrobot_->setParams(pulse_rate, geer_rate, wheel_diameter_right, wheel_diameter_left, tred_width);
+
   odom_pub_ = nh_.advertise<nav_msgs::Odometry>("/odom", 1);
   steer_pub_ = nh_.advertise<geometry_msgs::Twist>("/steer_ctrl", 1);
   cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(&cirkit::ThirdRobotDriver::cmdVelReceived, this, _1));
@@ -107,8 +118,8 @@ void cirkit::ThirdRobotDriver::cmdVelReceived(const geometry_msgs::Twist::ConstP
   static int steer = 0;
   {
 	boost::mutex::scoped_lock(access_mutex_);
-	cout << "cmdreived.x :" << cmd_vel->linear.x << endl;
-	cout << "cmdreived.z :" << cmd_vel->angular.z << endl;
+	// cout << "cmdreived.x :" << cmd_vel->linear.x << endl;
+	// cout << "cmdreived.z :" << cmd_vel->angular.z << endl;
 	steer_dir_ = thirdrobot_->drive(cmd_vel->linear.x, cmd_vel->angular.z);
   }
   steer_pub_.publish(steer_dir_);

@@ -90,6 +90,9 @@ namespace cirkit
     //! Close the serial port
     virtual int closeSerialPort();
 
+	//! Setting params
+	virtual void setParams(double pulse_rate, double geer_rate, double wheel_diameter_right, double wheel_diameter_left, double tred_width);
+
     //! Drive
     virtual geometry_msgs::Twist drive(double linear_speed, double angular_speed);
 
@@ -176,16 +179,16 @@ namespace cirkit
 	//! [k-1]のyaw
 	double last_odometry_yaw = 0.0;
 	//! num of pulse
-	const double PulseRate = 40.0;
+	double PulseRate = 40.0;
 	
 	//! GEER_RATE
-	const double GeerRate = 33.0;
+	double GeerRate = 33.0;
 	
 	//! Wheel Diameter[m]
-	const double WheelDiameter[2] = {0.2705, 0.275};
+	double WheelDiameter[2] = {0.2705, 0.275};
 
 	//! Tred width[m]
-	const double TredWidth = 0.595;
+	double TredWidth = 0.595;
 
 	//! Linear velocity
 	double linear_velocity;
