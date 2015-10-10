@@ -1,0 +1,8 @@
+<launch>
+    <arg name="sub_topic" default="base_scan1" />
+    <node pkg="rviz" type="rviz" name="rviz_for_lower_step_detector" args="-d $(find third_robot_lower_step_detector)/20151009_autorun_test_revised.rviz" />
+    <node pkg="third_robot_lower_step_detector" type="lower_step_detector.py" name="lower_step_detector" output="screen" args="$(arg sub_topic)">
+        <rosparam file="$(find third_robot_lower_step_detector)/config/lower_step_detector.yaml" command="load" />
+    </node>
+</launch>
+

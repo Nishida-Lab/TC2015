@@ -1,1 +1,8 @@
 /third_robot/third_robot_gmapping/map/20151006_ctrl_building.yaml~
+/third_robot/third_robot_lower_step_detector/bag_files/autorun.bag
+
+# vim
+.*.sw[a-z]
+*.un~
+Session.vim
+.netrwhist
