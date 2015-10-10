@@ -24,10 +24,10 @@
       <file leaf-file-name="lower_step_detector.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.2109375">
-              <caret line="22" column="23" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.54990923">
+              <caret line="68" column="28" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
               <folding>
-                <element signature="e#24#36#0" expanded="true" />
+                <element signature="e#149#161#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -66,8 +66,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1253" />
-    <option name="y" value="227" />
+    <option name="x" value="1075" />
+    <option name="y" value="281" />
     <option name="width" value="1844" />
     <option name="height" value="1294" />
   </component>
@@ -130,6 +130,7 @@
     <property name="recentsLimit" value="5" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.appearance" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="true" />
   </component>
   <component name="RunManager" selected="Python.lower_step_detector">
     <configuration default="false" name="lower_step_detector" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -145,7 +146,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="scripts" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/lower_step_detector.py" />
-      <option name="PARAMETERS" value="" />
+      <option name="PARAMETERS" value="base_scan" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
@@ -291,7 +292,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1253" y="227" width="1844" height="1294" extended-state="0" />
+    <frame x="1075" y="281" width="1844" height="1294" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -299,9 +300,9 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18980478" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.51217467" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.51217467" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3299748" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299748" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -319,20 +320,40 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="18" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
+          <line>74</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
+          <line>68</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
+          <line>57</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="23" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="message" language="Python" />
         <watch expression="message.ranges" language="Python" />
         <watch expression="len(message.ranges)" language="Python" />
-        <watch expression="laser_sensor_msg_ori.ranges" language="Python" />
-        <watch expression="len(laser_sensor_msg_fix.ranges)" language="Python" />
-        <watch expression="i" language="Python" />
-        <watch expression="laser_sensor_msg_ori.ranges[0]" language="Python" />
-        <watch expression="laser_sensor_msg_fix.ranges[0]" language="Python" />
-        <watch expression="tmp_fix_data" language="Python" />
-        <watch expression="math.sin(theta)" language="Python" />
+        <watch expression="id(laser_sensor_msg_fix)" language="Python" />
+        <watch expression="id(laser_sensor_msg_ori)" language="Python" />
+        <watch expression="id(laser_sensor_msg_fix.ranges[i])" language="Python" />
+        <watch expression="id(laser_sensor_msg_ori.ranges[i])" language="Python" />
+        <watch expression="laser_sensor_msg_ori.ranges[i]" language="Python" />
+        <watch expression="id(tmp_fix_data)" language="Python" />
+        <watch expression="id(laser_sensor_msg_fix.ranges)" language="Python" />
+        <watch expression="id(laser_sensor_msg_ori.ranges)" language="Python" />
+        <watch expression="laser_sensor_msg_fix.ranges" language="Python" />
+        <watch expression="argvs" language="Python" />
       </configuration>
     </watches-manager>
   </component>
@@ -342,7 +363,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#24#36#0" expanded="true" />
+            <element signature="e#149#161#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -371,14 +392,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49001816">
-          <caret line="1794" column="0" selection-start-line="1794" selection-start-column="0" selection-end-line="1794" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///opt/ros/indigo/lib/python2.7/dist-packages/rospy/topics.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -387,12 +400,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///opt/ros/indigo/lib/python2.7/dist-packages/rospy/client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3321234">
+          <caret line="189" column="4" selection-start-line="189" selection-start-column="4" selection-end-line="189" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.027223231">
+          <caret line="1777" column="0" selection-start-line="1777" selection-start-column="0" selection-end-line="1777" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///opt/ros/indigo/lib/python2.7/dist-packages/rospy/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3321234">
+          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.2109375">
-          <caret line="22" column="23" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.54990923">
+          <caret line="68" column="28" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
           <folding>
-            <element signature="e#24#36#0" expanded="true" />
+            <element signature="e#149#161#0" expanded="true" />
           </folding>
         </state>
       </provider>
