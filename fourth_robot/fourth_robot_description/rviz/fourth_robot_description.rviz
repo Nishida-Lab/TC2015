@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 595
   - Class: rviz/Selection
@@ -26,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Visualization Manager:
   Class: ""
   Displays:
@@ -53,7 +54,8 @@ Visualization Manager:
       Collision Enabled: false
       Enabled: true
       Links:
-        All Links Enabled: true
+        All Links Enabled:
+          {}
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
@@ -66,7 +68,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         base_scan:
           Alpha: 1
           Show Axes: false
@@ -79,32 +80,26 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         gim30_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         gps:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         rear_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -160,6 +155,64 @@ Visualization Manager:
               {}
       Update Interval: 0
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 5351
+      Min Color: 0; 0; 0
+      Min Intensity: 112
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.01
+      Style: Flat Squares
+      Topic: /front_scan
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensities[0]
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 3
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 5987
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.01
+      Style: Flat Squares
+      Topic: /point_cloud2
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -184,22 +237,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.45269
+      Distance: 4.44686
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.106191
-        Y: 0.037133
-        Z: 0.201625
+        X: 0.592956
+        Y: 0.586068
+        Z: 0.559699
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.194796
+      Pitch: 0.329796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.965399
+      Yaw: 2.67358
     Saved: ~
 Window Geometry:
   Displays:
@@ -217,5 +270,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1397
-  X: 43
-  Y: 24
+  X: 33
+  Y: -14
