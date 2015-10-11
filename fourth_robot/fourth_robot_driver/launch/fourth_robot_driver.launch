@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="fourth_robot_driver" type="fourth_robot_driver_node" name="fourth_robot_driver" output="screen">
+	<rosparam command="load" ns="/fourth_robot_driver" file="$(find fourth_robot_driver)/config/robot.yaml" />
+  </node>
+</launch>
