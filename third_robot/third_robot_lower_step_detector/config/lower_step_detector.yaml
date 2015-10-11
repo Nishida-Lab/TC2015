@@ -1,5 +1,5 @@
-laser_intensity_max: 3.0
+laser_intensity_max: 1.5
+margine_between_plane_and_down_step: 1.0
 virtual_laser_intensity: 1.0
-laser_scan_range_deg: 180
-detect_step_angle_min_deg: 40.0
-
+laser_scan_range_deg: 180.0
+detect_step_angle_min_deg: 10.0
