@@ -27,11 +27,11 @@ class LowerStapDetector():
     NAME_PARAM_DETECT_STEP_ANGLE_MIN_DEG = NAME_NODE + '/detect_step_angle_min_deg'
     NAME_PARAM_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP = NAME_NODE + '/margine_between_plane_and_down_step'
     # defalut parameter values
-    DEFAULT_LASER_INTENSITY_MAX = 3.0
+    DEFAULT_LASER_INTENSITY_MAX = 1.5
+    DEFAULT_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP = 1.5
     DEFAULT_VIRTUAL_LASER_INTENSITY = 1.0
     DEDAULT_LASER_SCAN_RANGE_DEG = 180.0
     DEFAULT_DETECT_STEP_ANGLE_MIN_DEG = 10.0
-    DEFAULT_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP = 0.4
 
     ## private member variables
     ## @var __laser_ori_sub
@@ -75,12 +75,12 @@ class LowerStapDetector():
 
     def load_rosparam(self):
         self.__laser_intensity_max = rospy.get_param(self.NAME_PARAM_LASER_INTENSITY, self.DEFAULT_LASER_INTENSITY_MAX)
+        self.__margine_between_plane_and_down_step = rospy.get_param(self.NAME_PARAM_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP, self.DEFAULT_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP)
         self.__virtual_laser_intensity = rospy.get_param(self.NAME_PARAM_VIRTUAL_LASER_INTENCITY, self.DEFAULT_VIRTUAL_LASER_INTENSITY)
         self.__laser_scan_range_deg = rospy.get_param(self.NAME_PARAM_LASER_SCAN_RANGE_DEG, self.DEDAULT_LASER_SCAN_RANGE_DEG)
         self.__detect_step_angle_min_deg = rospy.get_param(self.NAME_PARAM_DETECT_STEP_ANGLE_MIN_DEG, self.DEFAULT_DETECT_STEP_ANGLE_MIN_DEG)
         self.__detect_step_angle_max_deg = self.__laser_scan_range_deg - self.__detect_step_angle_min_deg
         self.__detect_angle_center_deg = self.__laser_scan_range_deg / 2.0
-        self.__margine_between_plane_and_down_step = rospy.get_param(self.NAME_PARAM_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP, self.DEFAULT_MARGINE_BETWEEN_PLANE_AND_DOWN_STEP)
 
     def on_subscribe_laser_scan(self, laser_sensor_msg_ori):
         laser_sensor_msg_fix = copy.deepcopy(laser_sensor_msg_ori)
