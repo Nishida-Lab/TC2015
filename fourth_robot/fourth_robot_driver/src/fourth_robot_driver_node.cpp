@@ -26,27 +26,25 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "fourth_robot_driver");
   ros::NodeHandle nh;
-
   FourthRobotDriver fourth_robot_driver(nh);
+  
   ros::Subscriber cmd_vel_sub = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelReceived);
- 
-  // ros::Time current_time, last_time;
-  // current_time = ros::Time::now();
-  // last_time = ros::Time::now();
-
-  ros::Time time;
-  ros::Rate r(fourth_robot_driver.ros_rate);
 
   geometry_msgs::TransformStamped odom_trans;
   odom_trans.header.frame_id = "odom";
   odom_trans.child_frame_id = "base_footprint";
+  tf::TransformBroadcaster odom_broadcaster;
   
   nav_msgs::Odometry odom;
   odom.header.frame_id = "odom";
   odom.child_frame_id = "base_footprint";
-
   ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 1);
-  tf::TransformBroadcaster odom_broadcaster;
+
+  ros::Rate r(fourth_robot_driver.ros_rate);
+
+  ros::Time time;
+
+  ROS_INFO("... Fourth Robot setup finished ...");
   
   while(ros::ok()){
 	fourth_robot_driver.getEncoderData(time);

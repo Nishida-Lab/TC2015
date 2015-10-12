@@ -47,25 +47,31 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   motor_pin_ch_left(2),
   rc_filter_rate(0.9)
 {
-  n.param("fourth_robot_driver/port_name", port_name, port_name);
-  n.param("fourth_robot_driver/ros_rate", ros_rate, ros_rate);
-  n.param("fourth_robot_driver/wheel_base", wheel_base, wheel_base);
-  n.param("fourth_robot_driver/tread", tread, tread);
-  n.param("fourth_robot_driver/wheel_diameter_right", wheel_diameter_right, wheel_diameter_right);
-  n.param("fourth_robot_driver/wheel_diameter_left", wheel_diameter_left, wheel_diameter_left);
-  n.param("fourth_robot_driver/max_linear_vel", max_linear_vel, max_linear_vel);
-  n.param("fourth_robot_driver/max_angular_vel", max_angular_vel, max_angular_vel);
-  n.param("fourth_robot_driver/gain_p_right", gain_p_right, gain_p_right);
-  n.param("fourth_robot_driver/gain_i_right", gain_i_right, gain_i_right);
-  n.param("fourth_robot_driver/gain_d_right", gain_d_right, gain_d_right);
-  n.param("fourth_robot_driver/gain_p_left", gain_p_left, gain_p_left);
-  n.param("fourth_robot_driver/gain_i_left", gain_i_left, gain_i_left);
-  n.param("fourth_robot_driver/gain_d_left", gain_d_left, gain_d_left);
-  n.param("fourth_robot_driver/motor_pin_right", motor_pin_right, motor_pin_right);
-  n.param("fourth_robot_driver/motor_pin_left", motor_pin_left, motor_pin_left);
-  n.param("fourth_robot_driver/enc_pin_right", enc_pin_right, enc_pin_right);
-  n.param("fourth_robot_driver/enc_pin_left", enc_pin_left, enc_pin_left);
-  n.param("fourth_robot_driver/rc_filter_rate", rc_filter_rate, rc_filter_rate);
+  // ------ Get Params ------
+  // robot property
+  n.param("fourth_robot_driver/property/ros_rate", ros_rate, ros_rate);
+  n.param("fourth_robot_driver/property/wheel_base", wheel_base, wheel_base);
+  n.param("fourth_robot_driver/property/tread", tread, tread);
+  n.param("fourth_robot_driver/property/wheel_diameter_right", wheel_diameter_right, wheel_diameter_right);
+  n.param("fourth_robot_driver/property/wheel_diameter_left", wheel_diameter_left, wheel_diameter_left);
+  // control
+  n.param("fourth_robot_driver/control/max_linear_vel", max_linear_vel, max_linear_vel);
+  n.param("fourth_robot_driver/control/max_angular_vel", max_angular_vel, max_angular_vel);
+  n.param("fourth_robot_driver/control/gain_p_right", gain_p_right, gain_p_right);
+  n.param("fourth_robot_driver/control/gain_i_right", gain_i_right, gain_i_right);
+  n.param("fourth_robot_driver/control/gain_d_right", gain_d_right, gain_d_right);
+  n.param("fourth_robot_driver/control/gain_p_left", gain_p_left, gain_p_left);
+  n.param("fourth_robot_driver/control/gain_i_left", gain_i_left, gain_i_left);
+  n.param("fourth_robot_driver/control/gain_d_left", gain_d_left, gain_d_left);
+  n.param("fourth_robot_driver/control/rc_filter_rate", rc_filter_rate, rc_filter_rate);
+  // iMCs01
+  n.param("fourth_robot_driver/imcs01/port_name", port_name, port_name);
+  n.param("fourth_robot_driver/imcs01/motor_pin_right", motor_pin_right, motor_pin_right);
+  n.param("fourth_robot_driver/imcs01/motor_pin_left", motor_pin_left, motor_pin_left);
+  n.param("fourth_robot_driver/imcs01/enc_pin_right", enc_pin_right, enc_pin_right);
+  n.param("fourth_robot_driver/imcs01/enc_pin_left", enc_pin_left, enc_pin_left);
+
+  
 
   motor_pin_right -= motor_pin_offset;
   motor_pin_left -= motor_pin_offset;
@@ -75,12 +81,10 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   motor_pin_ch_right = pow(2, motor_pin_right);
   motor_pin_ch_left = pow(2, motor_pin_left);
   
-  if(!openSerialPort()){
-    ROS_INFO("Connected to iMCs01.");
-  }else{
-    ROS_WARN("Could not connect to iMCS01.");
-    ROS_BREAK();
-  }  
+  if(openSerialPort() != 0){
+	ROS_WARN("Could not connect to iMCS01.");
+	ROS_BREAK();
+  }
 }
 
 FourthRobotDriver::~FourthRobotDriver()
@@ -194,6 +198,17 @@ int FourthRobotDriver::getEncoderCounts()
   static double time[3] = {0, 0, 0};
   static int enc_cnt_right[3] = {0, 0, 0};
   static int enc_cnt_left[3] = {0, 0, 0};
+  // set transform broadcaster
+  static tf::TransformBroadcaster right_tf_br;
+  static tf::TransformBroadcaster left_tf_br;
+  // set transform
+  tf::Transform right_trans;
+  tf::Transform left_trans;
+  tf::Quaternion right_q;
+  tf::Quaternion left_q;
+  // for rotation
+  static double sum_rad_right = 0;
+  static double sum_rad_left = 0;
   
   // ------ update current datas ------
   // get raw datas
@@ -228,7 +243,21 @@ int FourthRobotDriver::getEncoderCounts()
   delta_dist_right = (enc_cnt_right[2]/4000.0/geer_rate)*(wheel_diameter_right*M_PI);
   delta_dist_left = -(enc_cnt_left[2]/4000.0/geer_rate)*(wheel_diameter_left*M_PI);
   // get delta time (change from [ms] to [s] on diff time)
-  delta_time = time[2]/1000.0; 
+  delta_time = time[2]/1000.0;
+
+  // calcurate rotation
+  sum_rad_right += enc_cnt_right[2]/4000.0*M_PI;
+  sum_rad_left += enc_cnt_left[2]/4000.0*M_PI;
+  right_q.setRPY(0, sum_rad_right, 0);
+  left_q.setRPY(0, sum_rad_left, 0);
+  // set tf
+  right_trans.setOrigin( tf::Vector3(0, -0.214375, 0) );
+  right_trans.setRotation(right_q);
+  left_trans.setOrigin( tf::Vector3(0, 0.214375, 0) );
+  left_trans.setRotation(left_q);
+  // bloadcast tf
+  right_tf_br.sendTransform(tf::StampedTransform(right_trans, ros::Time::now(), "base_link", "right_wheel"));
+  left_tf_br.sendTransform(tf::StampedTransform(left_trans, ros::Time::now(), "base_link", "left_wheel"));
   // ------ finish to update the output datas ------
   
   // ------ update the past datas ------
