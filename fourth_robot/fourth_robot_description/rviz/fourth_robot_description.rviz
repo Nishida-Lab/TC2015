@@ -27,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -54,8 +54,7 @@ Visualization Manager:
       Collision Enabled: false
       Enabled: true
       Links:
-        All Links Enabled:
-          {}
+        All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
@@ -68,6 +67,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         base_scan:
           Alpha: 1
           Show Axes: false
@@ -80,26 +80,32 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         gim30_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         gps:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         rear_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -237,22 +243,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.44686
+      Distance: 2.08926
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.592956
-        Y: 0.586068
-        Z: 0.559699
+        X: 0
+        Y: 0
+        Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.329796
-      Target Frame: <Fixed Frame>
+      Pitch: 0.710399
+      Target Frame: base_footprint
       Value: Orbit (rviz)
-      Yaw: 2.67358
+      Yaw: 2.86902
     Saved: ~
 Window Geometry:
   Displays:
@@ -270,5 +276,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1397
-  X: 33
-  Y: -14
+  X: 43
+  Y: 24

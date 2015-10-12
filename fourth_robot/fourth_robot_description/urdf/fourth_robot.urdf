@@ -29,7 +29,7 @@
 	</visual>
   </link>
 
-  <joint name="base_link_to_right_wheel" type="fixed">
+  <joint name="base_link_to_right_wheel" type="continuous">
 	<parent link="base_link"/>
 	<child link="right_wheel"/>
 	<origin rpy="0 0 0" xyz="0 -0.214375 0"/>
@@ -44,10 +44,10 @@
 	</visual>
   </link>
 
-  <joint name="base_link_to_left_wheel" type="fixed">
+  <joint name="base_link_to_left_wheel" type="continuous">
 	<parent link="base_link"/>
 	<child link="left_wheel"/>
-	<origin rpy="3.141592 0 0" xyz="0 0.214375 0"/>
+	<origin rpy="0 0 3.141592" xyz="0 0.214375 0"/>
   </joint>
 
   <!-- sensors -->
