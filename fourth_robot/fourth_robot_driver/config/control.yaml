@@ -6,4 +6,4 @@ gain_d_right         : 0
 gain_p_left          : 1.0
 gain_i_left          : 0
 gain_d_left          : 0
-rc_filter_rate       : 0.9
+rc_filter_rate       : 0.3
