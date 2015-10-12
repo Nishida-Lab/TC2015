@@ -22,10 +22,11 @@ public:
 
   int getEncoderData(ros::Time &time);
   void calculateOdometry(geometry_msgs::TransformStamped &odom_trans, nav_msgs::Odometry &odom);
-
-  double ros_rate;
+  void culcurateVelocity(nav_msgs::Odometry &odom);
+  int Drive(geometry_msgs::Twist cmd);
   
 private:
+  double ros_rate;
   string port_name;
   double wheel_base;
   double tread;
@@ -60,10 +61,15 @@ private:
   double delta_time;
   double delta_dist_right;
   double delta_dist_left;
+  double vel_right;
+  double vel_left;
+  double max_vel_right;
+  double max_vel_left;
 
   // ------ function ------
   int openSerialPort();
   int closeSerialPort();
-  int getEncoderCounts();  
+  int getEncoderCounts();
+  int driveDirect(double target_vel_right, double target_vel_left, bool brake);
 };
 #endif 

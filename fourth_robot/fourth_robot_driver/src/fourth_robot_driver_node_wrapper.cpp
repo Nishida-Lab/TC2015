@@ -22,6 +22,8 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   delta_time(0),
   delta_dist_right(0),
   delta_dist_left(0),
+  vel_right(0),
+  vel_left(0),
   fd(-1),
   port_name("/dev/urbtc0"),
   ros_rate(100),
@@ -70,21 +72,30 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   n.param("fourth_robot_driver/imcs01/motor_pin_left", motor_pin_left, motor_pin_left);
   n.param("fourth_robot_driver/imcs01/enc_pin_right", enc_pin_right, enc_pin_right);
   n.param("fourth_robot_driver/imcs01/enc_pin_left", enc_pin_left, enc_pin_left);
+  // ------ finish to get param ------
 
+  // ------ prepare for motor control ------
+  // 100 means max rpm of the motor unit (BLH230K-30)
+  max_vel_right = wheel_diameter_right * M_PI * 100.0/60.0;
+  max_vel_left = wheel_diameter_left * M_PI * 100.0/60.0;
+  // ------ finish to prepare for motor control ------
   
-
+  // ------ iMCs01 ------
+  // information
+  // get order of pins
   motor_pin_right -= motor_pin_offset;
   motor_pin_left -= motor_pin_offset;
   enc_pin_right -= enc_pin_offset;
   enc_pin_left -= enc_pin_offset;
-
+  // get channnel of pins
   motor_pin_ch_right = pow(2, motor_pin_right);
   motor_pin_ch_left = pow(2, motor_pin_left);
-  
+  // open serial
   if(openSerialPort() != 0){
 	ROS_WARN("Could not connect to iMCS01.");
 	ROS_BREAK();
   }
+  // ------ end of iMCs01 ------
 }
 
 FourthRobotDriver::~FourthRobotDriver()
@@ -165,7 +176,7 @@ int FourthRobotDriver::closeSerialPort()
   if(write(fd, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
     throw logic_error("Faild to write : iMCS01");
 
-  ROS_INFO("Motor is Stoped.");
+  cout << "[fourth_robot_driver] Stoped the motor." << endl;
 
   if(fd > 0){
     tcsetattr(fd, TCSANOW, &oldtio);
@@ -173,7 +184,7 @@ int FourthRobotDriver::closeSerialPort()
     fd = -1;
   }
   
-  ROS_INFO("iMCs01 Port is Closed.");
+  cout << "[fourth_robot_driver] Closed the iMCs01 Port." << endl;
 }
 
 int FourthRobotDriver::getEncoderData(ros::Time &time)
@@ -195,7 +206,7 @@ int FourthRobotDriver::getEncoderCounts()
   //   last    : 1
   //   diff    : 2
   // ------------------  
-  static double time[3] = {0, 0, 0};
+  static double time[3] = {1, 0, 0};
   static int enc_cnt_right[3] = {0, 0, 0};
   static int enc_cnt_left[3] = {0, 0, 0};
   // set transform broadcaster
@@ -306,45 +317,91 @@ void FourthRobotDriver::calculateOdometry(geometry_msgs::TransformStamped &odom_
   odom.pose.pose.orientation = odom_quat;
 }
 
-
-// int FourthRobotDriver::drive(double linear_vel, double angular_vel, int brake)
-// {
-//   double right_vel = 0;
-//   double left_vel = 0;
-
-//   right_vel = (2.0*linear_vel + tread*angular_vel)/2.0;
-//   left_vel = (2.0*linear_vel - tread*angular_vel)/2.0;
-
-//   return driveDirect(right_vel, left_vel, brake);
-// }
-
-// int FourthRobotDriver::driveDirect(double right_vel, double left_vel, int brake)
-// {
-//   //右タイヤへの入力速度[r]
-//   cmd_ccmd.offset[motor_pin_right] =  (int)(0x7fff - 0x7fff*(right_vel/right_max_vel)); 
-//   //左タイヤへの入力速度[r]
-//   cmd_ccmd.offset[motor_pin_left] = (int)(0x7fff + 0x7fff*(left_vel/left_max_vel));
-
-//   // ブレーキ
-//   if(brake)
-// 	cmd_ccmd.breaks = SET_BREAKS | motor_pin_ch_right | motor_pin_ch_left;   
-//   // if(right_over_flg && left_over_flg)
-//   //   cmd_ccmd.breaks = SET_BREAKS | CH0 | CH1;
-//   // else if(right_over_flg) (right=CH1)
-//   //   cmd_ccmd.breaks = SET_BREAKS | CH1;
-//   // else if(left_over_flg) (left=CH0)
-//   //   cmd_ccmd.breaks = SET_BREAKS | CH0;
+void FourthRobotDriver::culcurateVelocity(nav_msgs::Odometry &odom){
+  // ------ Rule ------
+  //   current : 0
+  //   last    : 1
+  // ------------------
+  static double rcf_vel_right[2] = {0, 0};
+  static double rcf_vel_left[2] = {0, 0};
+  double linear_vel;
+  double angular_vel;
+  static int cnt = 0;
   
+  // ------ update current data ------
+  // get raw data
+  rcf_vel_right[0] = delta_dist_right / delta_time;
+  rcf_vel_left[0] = delta_dist_left / delta_time;
+  // RC filter (y[k] = a*y[k-1] + (1-a)*x[k])
+  // vel_right = rc_filter_rate*rcf_vel_right[1] + (1.0-rc_filter_rate)*rcf_vel_right[0];
+  // vel_left = rc_filter_rate*rcf_vel_left[1] + (1.0-rc_filter_rate)*rcf_vel_left[0];
+  vel_right = rcf_vel_right[0];
+  vel_left = rcf_vel_left[0];
+  cout << cnt << "\t" << delta_time << "\t" << vel_left << endl;
+  cnt++;
+  // ------ finish to update current data ------
 
-//   //設定値の書き込み---------------------------------------------
-//   if(ioctl(fd, URBTC_COUNTER_SET) < 0){
-//     throw logic_error("Faild to ioctl: URBTC_COUNTER_SET");
-//   }
-//   if(write(fd, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
-//     throw logic_error("Faild to write");
-//   }
-//   //------------------------------------------------------------
+  // ------ update output data ------
+  // culculate linear and angular velocity
+  linear_vel = (vel_right + vel_left)/2.0;
+  angular_vel = (vel_right - vel_left)/tread;
+  // input to odom data
+  odom.twist.twist.linear.x = linear_vel;
+  odom.twist.twist.linear.y = 0;
+  odom.twist.twist.linear.z = 0;
+  odom.twist.twist.angular.x = 0;
+  odom.twist.twist.angular.y = 0;
+  odom.twist.twist.angular.z = angular_vel;
+  // ------ finish to update output data ------
+
+  // ------ update past data ------
+  rcf_vel_right[1] = vel_right;
+  rcf_vel_left[1] = vel_right;
+  // ------ finish to update past data ------
+}
+
+int FourthRobotDriver::Drive(const geometry_msgs::Twist cmd)
+{
+  double target_vel_right = 0;
+  double target_vel_left = 0;
+  bool brake = false;
+  
+  if(cmd.linear.x == 0 && cmd.angular.z == 0)
+	brake = true;
+	
+  target_vel_right = (2.0*cmd.linear.x + tread*cmd.angular.z)/2.0;
+  target_vel_left = (2.0*cmd.linear.x - tread*cmd.angular.z)/2.0;
+  
+  return driveDirect(target_vel_right, target_vel_left, brake);
+}
+
+int FourthRobotDriver::driveDirect(double target_vel_right, double target_vel_left, bool brake)
+{
+  double input_vel_right;
+  double input_vel_left;
+  unsigned char input_brake = SET_BREAKS;
+
+  // input_vel_right = target_vel_right;
+  // input_vel_left = target_vel_left;
+
+  input_vel_right = max_vel_right;
+  input_vel_left = max_vel_left;
+  
+  if(brake)
+	input_brake = input_brake | motor_pin_ch_right | motor_pin_ch_left;
+
+  // ------ write input datas to iMCs01 ------
+  // culculate input data
+  cmd_ccmd.offset[motor_pin_right] =  (int)(0x7fff - 0x7fff*(input_vel_right/max_vel_right)); 
+  cmd_ccmd.offset[motor_pin_left] = (int)(0x7fff + 0x7fff*(input_vel_left/max_vel_left));
+  cmd_ccmd.breaks = input_brake;
+  // write
+  if(ioctl(fd, URBTC_COUNTER_SET) < 0)
+	throw logic_error("Faild to ioctl: URBTC_COUNTER_SET");
+  if(write(fd, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
+	throw logic_error("Faild to write");
+  // ------ finish to write input datas to iMCs01 ------
  
-//   return 0;
-// }
+  return 0;
+}
 
