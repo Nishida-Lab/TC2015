@@ -9,7 +9,7 @@
 		type="third_robot_waypoints_saver" 
 		name="third_robot_waypoints_saver"
 		output="screen">
-    <param name="savewaypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510110332.csv " />
+    <param name="savewaypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510110332-2.csv " />
   </node>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find third_robot_nav_goals)/config/third_robot_waypoints_saver.rviz" required="true" />
