@@ -227,8 +227,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 		   || stasis_ == ROBOT_STASIS_FORWARD_STOP)
 		{ // Now Forwarding
 			e = rear_speed_m_s - linear_velocity;
-			//cout << "linear_v : " << linear_velocity << endl;
-			//cout << "e:" << e << endl;
 			u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
 				- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
 
@@ -319,6 +317,9 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	// front_angular	: target angle[deg];
 	// steer_angle	: now angle[deg];
 	double input_angle = 0;
+	input_angle = MAX(front_angular, -45.0);
+	input_angle = MIN(input_angle, 45.0);
+
 	if(front_angular >= 45.0)
 	{
 		input_angle = 45.0;
