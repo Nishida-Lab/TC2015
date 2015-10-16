@@ -276,6 +276,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			{ 
 				ROS_WARN("imcs01 write fail.");
 			}
+			//writeCmd(cmd_ccmd);
 			if(forward_stop_cnt >= 20)
 			{
 				stasis_ = ROBOT_STASIS_FORWARD_STOP;
@@ -525,6 +526,22 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
   // std::cout << "----------" << std::endl;
 }
 
+void cirkit::ThirdRobotInterface::writeCmd(uin cmd)
+{
+	
+}
+
+void cirkit::ThirdRobotInterface::writeCmd(ccmd cmd)
+{
+	if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
+	{
+		ROS_WARN("URBTC_COUNTER_SET fail.");
+	} // error
+	if(write(fd_imcs01, &cmd, sizeof(cmd)) < 0)
+	{ 
+		ROS_WARN("iMCs01 write fail.");
+	}
+}
 
 int plus_or_minus(double value){
   if(value > 0){

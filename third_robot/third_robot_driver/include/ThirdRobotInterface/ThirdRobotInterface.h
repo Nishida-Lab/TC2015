@@ -111,6 +111,11 @@ namespace cirkit
     //! Set new odometry.
     virtual void setOdometry(double new_x, double new_y, double new_yaw);
 
+	//! write to iMCs01 (uin)
+	virtual void writeCmd(uin cmd);
+	
+	//! write to iMCs01 (ccmd)
+	virtual void writeCmd(ccmd cmd);
 
     //! robot odometry x[m]
     double odometry_x_;
