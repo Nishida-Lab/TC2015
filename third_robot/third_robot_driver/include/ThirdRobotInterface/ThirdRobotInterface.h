@@ -111,6 +111,8 @@ namespace cirkit
     //! Set new odometry.
     virtual void setOdometry(double new_x, double new_y, double new_yaw);
 
+	//! write to iMCs01 (ccmd)
+	virtual void writeCmd(ccmd cmd);
 
     //! robot odometry x[m]
     double odometry_x_;
@@ -137,7 +139,7 @@ namespace cirkit
     int parseFrontEncoderCounts();
     int parseRearEncoderCounts();
 
-
+	geometry_msgs::Twist fixFrontAngle(double angular_diff);
 
     //! For access to iMCs01
     struct uin cmd_uin;
