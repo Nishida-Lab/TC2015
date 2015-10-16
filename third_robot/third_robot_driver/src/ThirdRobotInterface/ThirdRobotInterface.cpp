@@ -178,12 +178,12 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
   else
   {
 	front_angle_deg = angular_speed*(180.0/M_PI);
-	cout << "front_angle_deg : " << front_angle_deg << endl;
+	//cout << "front_angle_deg : " << front_angle_deg << endl;
   }
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
 
-  cout <<  " target_rear_speed_ms : " << rear_speed_m_s << endl;
+  //cout <<  " target_rear_speed_ms : " << rear_speed_m_s << endl;
 
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
@@ -318,7 +318,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	double input_angle = 0;
 	input_angle = MAX(front_angular, -45.0);
 	input_angle = MIN(input_angle, 45.0);
-
+	//ROS_INFO("input angle : %lf\n", input_angle);
 
 	double angdiff = (input_angle - steer_angle);
 	// cout << "steer_angle: " << steer_angle << endl;
@@ -342,7 +342,7 @@ int cirkit::ThirdRobotInterface::getEncoderPacket()
 // Parse encoder data
 int cirkit::ThirdRobotInterface::parseEncoderPackets()
 {
-    //parseFrontEncoderCounts();
+    parseFrontEncoderCounts();
     parseRearEncoderCounts();
     return 0;
 }
