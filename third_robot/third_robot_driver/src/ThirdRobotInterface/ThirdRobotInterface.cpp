@@ -373,7 +373,7 @@ int cirkit::ThirdRobotInterface::getEncoderPacket()
 // Parse encoder data
 int cirkit::ThirdRobotInterface::parseEncoderPackets()
 {
-    parseFrontEncoderCounts();
+    //parseFrontEncoderCounts();
     parseRearEncoderCounts();
     return 0;
 }
