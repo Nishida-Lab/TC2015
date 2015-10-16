@@ -139,7 +139,7 @@ namespace cirkit
     int parseFrontEncoderCounts();
     int parseRearEncoderCounts();
 
-
+	geometry_msgs::Twist fixFrontAngle(double angular_diff);
 
     //! For access to iMCs01
     struct uin cmd_uin;

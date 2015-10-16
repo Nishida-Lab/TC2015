@@ -320,42 +320,12 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	input_angle = MAX(front_angular, -45.0);
 	input_angle = MIN(input_angle, 45.0);
 
-	// if(front_angular >= 45.0)
-	// {
-	// 	input_angle = 45.0;
-	// }
-	// else if(front_angular <= -45)
-	// { 
-	// 	input_angle = -45.0;
-	// }
-	// else
-	// {
-	// 	input_angle = (double)front_angular;
-	// }
 
 	double angdiff = (input_angle - steer_angle);
 	cout << "steer_angle: " << steer_angle << endl;
 	cout << "input_angle: " << input_angle << endl;
 	cout << "angdiff: " << angdiff << endl;
-	geometry_msgs::Twist ret_steer;
-	if(angdiff > 0)
-	{
-		ret_steer.angular.z = 1;
-		ret_steer.angular.x = fabs(angdiff);
-		return ret_steer;
-	}
-	else if(angdiff < 0)
-	{
-		ret_steer.angular.z = -1;
-		ret_steer.angular.x = fabs(angdiff);
-		return ret_steer;
-	}
-	else
-	{
-		ret_steer.angular.z = 0;
-		ret_steer.angular.x = 0;
-		return ret_steer;
-	}
+	geometry_msgs::Twist ret_steer = fixFrontAngle(angdiff);
 
 }
 
@@ -514,6 +484,29 @@ void cirkit::ThirdRobotInterface::writeCmd(ccmd cmd)
 	if(write(fd_imcs01, &cmd, sizeof(cmd)) < 0)
 	{ 
 		ROS_WARN("iMCs01 write fail.");
+	}
+}
+
+geometry_msgs::Twist cirkit::ThirdRobotInterface::fixFrontAngle(double angular_diff)
+{
+	geometry_msgs::Twist ret_steer;
+	if(angular_diff > 0)
+	{
+		ret_steer.angular.z = 1;
+		ret_steer.angular.x = fabs(angular_diff);
+		return ret_steer;
+	}
+	else if(angular_diff < 0)
+	{
+		ret_steer.angular.z = -1;
+		ret_steer.angular.x = fabs(angular_diff);
+		return ret_steer;
+	}
+	else
+	{
+		ret_steer.angular.z = 0;
+		ret_steer.angular.x = 0;
+		return ret_steer;
 	}
 }
 
