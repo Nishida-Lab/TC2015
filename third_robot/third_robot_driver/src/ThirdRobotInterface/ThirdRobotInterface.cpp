@@ -245,14 +245,9 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 			cmd_ccmd.offset[1] = (int)(duty);
 			runmode = FORWARD_MODE;
-			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
-			{
-				ROS_WARN("URBTC_COUNTER_SET fail.");
-			}
-			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
-			{ 
-				ROS_WARN("imcs01 write fail.");
-			}
+
+			writeCmd(cmd_ccmd);
+
 			stasis_ = ROBOT_STASIS_FORWARD;
 		}
 		else
@@ -268,15 +263,8 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			e2 = e1; 
 			e1 = e;
 
-			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
-			{
-				ROS_WARN("URBTC_COUNTER_SET fail.");
-			} // error
-			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
-			{ 
-				ROS_WARN("imcs01 write fail.");
-			}
-			//writeCmd(cmd_ccmd);
+			writeCmd(cmd_ccmd);
+
 			if(forward_stop_cnt >= 20)
 			{
 				stasis_ = ROBOT_STASIS_FORWARD_STOP;
@@ -301,15 +289,9 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			u = 32767;
 			duty = MIN(u, 62176);
 			u2 = u1; u1 = duty; e2 = e1; e1 = e;
+			
+			writeCmd(cmd_ccmd);
 
-			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
-			{
-				ROS_WARN("URBTC_COUNTER_SET fail.");
-			}
-			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
-			{
-				ROS_WARN("imcs01 write fail.");
-			}
 			stasis_ = ROBOT_STASIS_BACK;
 		}
 		else
@@ -317,14 +299,9 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
 			cmd_ccmd.offset[1] = 32767; // STOP
 			runmode = BACK_STOP_MODE;
-			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
-			{
-				ROS_WARN("URBTC_COUNTER_SET fail.");
-			}
-			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
-			{
-				ROS_WARN("imcs01 write fail.");
-			}
+			
+			writeCmd(cmd_ccmd);
+
 			if(back_stop_cnt >= 20)
 			{
 				stasis_ = ROBOT_STASIS_BACK_STOP;
