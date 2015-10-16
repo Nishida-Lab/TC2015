@@ -227,8 +227,10 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 		   || stasis_ == ROBOT_STASIS_FORWARD_STOP)
 		{ // Now Forwarding
 			e = rear_speed_m_s - linear_velocity;
-			u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
-				- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
+			u = u1 + (gain_p + gain_i * delta_rear_encoder_time 
+					  + gain_d/delta_rear_encoder_time) * e 
+				- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 
+				+ (gain_d/delta_rear_encoder_time)*e2;
 
 			if(rear_speed == 0.0)
 			{ 
@@ -242,7 +244,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			e1 = e;
 			cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 			cmd_ccmd.offset[1] = (int)(duty);
-			runmode = FORWARD_MODE;
 
 			writeCmd(cmd_ccmd);
 
@@ -253,7 +254,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			// Need to stop once.
 			cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
 			cmd_ccmd.offset[1] = 32767; // STOP
-			runmode = FORWARD_STOP_MODE;
+
 			u = 32767;
 			duty = u;
 			u2 = u1; 
@@ -263,7 +264,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 
 			writeCmd(cmd_ccmd);
 
-			if(forward_stop_cnt >= 20)
+			if(forward_stop_cnt >= 40)
 			{
 				stasis_ = ROBOT_STASIS_FORWARD_STOP;
 				forward_stop_cnt = 0;
@@ -282,7 +283,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 		{ // Now backing
 			cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V]. Backing flag.
 			cmd_ccmd.offset[1] = 60000; // Back is constant speed.
-			runmode = BACK_MODE;
 
 			u = 32767;
 			duty = MIN(u, 62176);
@@ -296,11 +296,10 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 		{ // Now forwarding
 			cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
 			cmd_ccmd.offset[1] = 32767; // STOP
-			runmode = BACK_STOP_MODE;
 			
 			writeCmd(cmd_ccmd);
 
-			if(back_stop_cnt >= 20)
+			if(back_stop_cnt >= 40)
 			{
 				stasis_ = ROBOT_STASIS_BACK_STOP;
 				back_stop_cnt = 0;
@@ -322,11 +321,10 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 
 
 	double angdiff = (input_angle - steer_angle);
-	cout << "steer_angle: " << steer_angle << endl;
-	cout << "input_angle: " << input_angle << endl;
-	cout << "angdiff: " << angdiff << endl;
-	geometry_msgs::Twist ret_steer = fixFrontAngle(angdiff);
-
+	// cout << "steer_angle: " << steer_angle << endl;
+	// cout << "input_angle: " << input_angle << endl;
+	// cout << "angdiff: " << angdiff << endl;
+	return  fixFrontAngle(angdiff);
 }
 
 // *****************************************************************************
