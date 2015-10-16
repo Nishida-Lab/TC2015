@@ -320,18 +320,18 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	input_angle = MAX(front_angular, -45.0);
 	input_angle = MIN(input_angle, 45.0);
 
-	if(front_angular >= 45.0)
-	{
-		input_angle = 45.0;
-	}
-	else if(front_angular <= -45)
-	{ 
-		input_angle = -45.0;
-	}
-	else
-	{
-		input_angle = (double)front_angular;
-	}
+	// if(front_angular >= 45.0)
+	// {
+	// 	input_angle = 45.0;
+	// }
+	// else if(front_angular <= -45)
+	// { 
+	// 	input_angle = -45.0;
+	// }
+	// else
+	// {
+	// 	input_angle = (double)front_angular;
+	// }
 
 	double angdiff = (input_angle - steer_angle);
 	cout << "steer_angle: " << steer_angle << endl;
