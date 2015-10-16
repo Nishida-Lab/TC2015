@@ -21,7 +21,8 @@ cirkit::ThirdRobotInterface::ThirdRobotInterface(
   fd_imcs01 = -1;
   baudrate_imcs01 = new_baudrate_imcs01;
 
-  for(int i = 0; i < 2; i++){
+  for(int i = 0; i < 2; i++)
+  {
 	delta_rear_encoder_counts[i] = -1;
 	last_rear_encoder_counts[i] = 0;
   }
@@ -43,19 +44,25 @@ cirkit::ThirdRobotInterface::~ThirdRobotInterface()
   write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd));
 
   //! iMCs01
-  if(fd_imcs01 > 0){
+  if(fd_imcs01 > 0)
+  {
     tcsetattr(fd_imcs01, TCSANOW, &oldtio_imcs01);
     close(fd_imcs01);
   }
   fd_imcs01 = -1;
 }
 
+
 // *****************************************************************************
 // Open the serial port
 int cirkit::ThirdRobotInterface::openSerialPort()
 {
-  try{ setSerialPort(); }
-  catch(exception &e){
+  try
+  { 
+	  setSerialPort();
+  }
+  catch(exception &e)
+  {
 	cerr << e.what() << endl;
 	return -1; 
   }
@@ -66,16 +73,21 @@ int cirkit::ThirdRobotInterface::openSerialPort()
 int cirkit::ThirdRobotInterface::setSerialPort()
 {
   // Setting iMCs01
-  if(fd_imcs01 > 0){
+  if(fd_imcs01 > 0)
+  {
 	throw logic_error("imcs01 is already open");
   }
   fd_imcs01 = open(imcs01_port_name.c_str(), O_RDWR);
-  if(fd_imcs01 > 0){
+  if(fd_imcs01 > 0)
+  {
 	tcgetattr(fd_imcs01, &oldtio_imcs01);
-  }else{
+  }
+  else
+  {
 	throw logic_error("Faild to open port: imcs01");
   }
-  if(ioctl(fd_imcs01, URBTC_CONTINUOUS_READ) < 0){
+  if(ioctl(fd_imcs01, URBTC_CONTINUOUS_READ) < 0)
+  {
 	throw logic_error("Faild to ioctl: URBTC_CONTINUOUS_READ");
   }
  
@@ -93,10 +105,12 @@ int cirkit::ThirdRobotInterface::setSerialPort()
   cmd_ccmd.breaks     = SET_BREAKS | CH0 | CH1 | CH2 | CH3; //No Brake;
   cmd_ccmd.magicno    = 0x00;
 
-  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
+  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
+  {
 	throw logic_error("Faild to ioctl: URBTC_COUNTER_SET");
   }
-  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
+  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
+  {
 	throw logic_error("Faild to write");
   }
 
@@ -133,7 +147,8 @@ int cirkit::ThirdRobotInterface::closeSerialPort()
   drive(0.0, 0.0);
   usleep(1000);
 
-  if(fd_imcs01 > 0){
+  if(fd_imcs01 > 0)
+  {
     tcsetattr(fd_imcs01, TCSANOW, &oldtio_imcs01);
     close(fd_imcs01);
     fd_imcs01 = -1;
@@ -150,16 +165,18 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
 {
   // Front angle in deg.
   double front_angle_deg = 0;
-  if(linear_speed == 0.0){
+  if(linear_speed == 0.0)
+  {
 	front_angle_deg = 0;
 	// その場旋回を要求してきたら後退する。
-	if(fabs(angular_speed) > 0.0){
+	if(fabs(angular_speed) > 0.0)
+	{
 	  double rear_speed_m_s = -0.5;
 	  return driveDirect(front_angle_deg, rear_speed_m_s);
 	}
-  }else{
-	// front_angle_deg = ((atan((WHEELBASE_LENGTH*angular_speed)/linear_speed))*(180/M_PI));
-	//front_angle_deg = ((atan2((WHEELBASE_LENGTH*angular_speed),linear_speed))*(180/M_PI));
+  }
+  else
+  {
 	front_angle_deg = angular_speed*(180.0/M_PI);
 	cout << "front_angle_deg : " << front_angle_deg << endl;
   }
@@ -186,140 +203,180 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
 
 geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angular, double rear_speed)
 {
-  static int forward_stop_cnt = 0;
-  static int back_stop_cnt = 0;
+	static int forward_stop_cnt = 0;
+	static int back_stop_cnt = 0;
 
-  static double u = 32767.0;
-  static double u1 = 32767.0;
-  static double u2 = 32767.0;
-  static double e = 0;
-  static double e1 = 0;
-  static double e2 = 0;
+	static double u = 32767.0;
+	static double u1 = 32767.0;
+	static double u2 = 32767.0;
+	static double e = 0;
+	static double e1 = 0;
+	static double e2 = 0;
 
-  static double gain_p = 10000.0;
-  static double gain_i = 10000.0;
-  static double gain_d = 1000.0;
+	static double gain_p = 10000.0;
+	static double gain_i = 10000.0;
+	static double gain_d = 1000.0;
 
-  double duty = 0;
+	double duty = 0;
 
-  if(rear_speed >= 0.0){	// Forward
-	double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
-	if(stasis_ == ROBOT_STASIS_FORWARD || stasis_ == ROBOT_STASIS_FORWARD_STOP){ // Now Forwarding
-	  e = rear_speed_m_s - linear_velocity;
-	  //cout << "linear_v : " << linear_velocity << endl;
-	  //cout << "e:" << e << endl;
-	  u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
-		- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
+	// Forward
+	if(rear_speed >= 0.0)
+	{	
+		double rear_speed_m_s = MIN(rear_speed, MAX_LIN_VEL); // return smaller
+		if(stasis_ == ROBOT_STASIS_FORWARD 
+		   || stasis_ == ROBOT_STASIS_FORWARD_STOP)
+		{ // Now Forwarding
+			e = rear_speed_m_s - linear_velocity;
+			//cout << "linear_v : " << linear_velocity << endl;
+			//cout << "e:" << e << endl;
+			u = u1 + (gain_p + gain_i * delta_rear_encoder_time + gain_d/delta_rear_encoder_time) * e 
+				- (gain_p + 2.0*gain_d/delta_rear_encoder_time)*e1 + (gain_d/delta_rear_encoder_time)*e2;
 
-	  if(rear_speed == 0.0){ u = 32767; }
-	  duty = MIN(u, 60000);
-	  duty = MAX(duty, 32767);
-	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
-	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
-	  cmd_ccmd.offset[1] = (int)(duty);
-	  runmode = FORWARD_MODE;
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
-		ROS_WARN("URBTC_COUNTER_SET fail.");
-	  }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ 
-		ROS_WARN("imcs01 write fail.");
-	  }
-	  stasis_ = ROBOT_STASIS_FORWARD;
-	}else{ // Now Backing
-	  // Need to stop once.
-	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
-	  cmd_ccmd.offset[1] = 32767; // STOP
-	  runmode = FORWARD_STOP_MODE;
-	  u = 32767;
-	  duty = u;
-	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
+			if(rear_speed == 0.0)
+			{ 
+				u = 32767; 
+			}
+			duty = MIN(u, 60000);
+			duty = MAX(duty, 32767);
+			u2 = u1; 
+			u1 = duty; 
+			e2 = e1; 
+			e1 = e;
+			cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
+			cmd_ccmd.offset[1] = (int)(duty);
+			runmode = FORWARD_MODE;
+			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
+			{
+				ROS_WARN("URBTC_COUNTER_SET fail.");
+			}
+			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
+			{ 
+				ROS_WARN("imcs01 write fail.");
+			}
+			stasis_ = ROBOT_STASIS_FORWARD;
+		}
+		else
+		{ // Now Backing
+			// Need to stop once.
+			cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
+			cmd_ccmd.offset[1] = 32767; // STOP
+			runmode = FORWARD_STOP_MODE;
+			u = 32767;
+			duty = u;
+			u2 = u1; 
+			u1 = duty; 
+			e2 = e1; 
+			e1 = e;
 
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
-		ROS_WARN("URBTC_COUNTER_SET fail.");
-	  } // error
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ 
-		ROS_WARN("imcs01 write fail.");
-	  }
-	  if(forward_stop_cnt >= 20){
-		stasis_ = ROBOT_STASIS_FORWARD_STOP;
-		forward_stop_cnt = 0;
-	  }else{
-		stasis_ = ROBOT_STASIS_OTHERWISE;
-		forward_stop_cnt++;
-	  }
+			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
+			{
+				ROS_WARN("URBTC_COUNTER_SET fail.");
+			} // error
+			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
+			{ 
+				ROS_WARN("imcs01 write fail.");
+			}
+			if(forward_stop_cnt >= 20)
+			{
+				stasis_ = ROBOT_STASIS_FORWARD_STOP;
+				forward_stop_cnt = 0;
+			}
+			else
+			{
+				stasis_ = ROBOT_STASIS_OTHERWISE;
+				forward_stop_cnt++;
+			}
+		}
 	}
-  }else{ // (rear_speed < 0) -> Back
-	if(stasis_ == ROBOT_STASIS_BACK_STOP || stasis_ == ROBOT_STASIS_BACK){ // Now backing
-	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V]. Backing flag.
-	  cmd_ccmd.offset[1] = 60000; // Back is constant speed.
-	  runmode = BACK_MODE;
+	else
+	{ // (rear_speed < 0) -> Back
+		if(stasis_ == ROBOT_STASIS_BACK_STOP 
+		   || stasis_ == ROBOT_STASIS_BACK)
+		{ // Now backing
+			cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V]. Backing flag.
+			cmd_ccmd.offset[1] = 60000; // Back is constant speed.
+			runmode = BACK_MODE;
 
-	  u = 32767;
-	  duty = MIN(u, 62176);
-	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
+			u = 32767;
+			duty = MIN(u, 62176);
+			u2 = u1; u1 = duty; e2 = e1; e1 = e;
 
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
-		ROS_WARN("URBTC_COUNTER_SET fail.");
-	  }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
-		ROS_WARN("imcs01 write fail.");
-	  }
-	  stasis_ = ROBOT_STASIS_BACK;
-	}else{ // Now forwarding
-	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
-	  cmd_ccmd.offset[1] = 32767; // STOP
-	  runmode = BACK_STOP_MODE;
-	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
-		ROS_WARN("URBTC_COUNTER_SET fail.");
-	  }
-	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
-		ROS_WARN("imcs01 write fail.");
-	  }
-	  if(back_stop_cnt >= 20){
-		stasis_ = ROBOT_STASIS_BACK_STOP;
-		back_stop_cnt = 0;
-	  }else{
-		stasis_ = ROBOT_STASIS_OTHERWISE;
-		back_stop_cnt++;
-	  }
+			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
+			{
+				ROS_WARN("URBTC_COUNTER_SET fail.");
+			}
+			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
+			{
+				ROS_WARN("imcs01 write fail.");
+			}
+			stasis_ = ROBOT_STASIS_BACK;
+		}
+		else
+		{ // Now forwarding
+			cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
+			cmd_ccmd.offset[1] = 32767; // STOP
+			runmode = BACK_STOP_MODE;
+			if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0)
+			{
+				ROS_WARN("URBTC_COUNTER_SET fail.");
+			}
+			if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0)
+			{
+				ROS_WARN("imcs01 write fail.");
+			}
+			if(back_stop_cnt >= 20)
+			{
+				stasis_ = ROBOT_STASIS_BACK_STOP;
+				back_stop_cnt = 0;
+			}
+			else
+			{
+				stasis_ = ROBOT_STASIS_OTHERWISE;
+				back_stop_cnt++;
+			}
+		}
 	}
-  }
 
-  // Steer ctrl
-  // front_angular	: target angle[deg];
-  // steer_angle	: now angle[deg];
-  double input_angle = 0;
-  if(front_angular >= 45.0)
+	// Steer ctrl
+	// front_angular	: target angle[deg];
+	// steer_angle	: now angle[deg];
+	double input_angle = 0;
+	if(front_angular >= 45.0)
 	{
-      input_angle = 45.0;
+		input_angle = 45.0;
 	}
-  else if(front_angular <= -45)
+	else if(front_angular <= -45)
 	{ 
-	  input_angle = -45.0;
+		input_angle = -45.0;
 	}
-  else
+	else
 	{
-	  input_angle = (double)front_angular;
+		input_angle = (double)front_angular;
 	}
 
-  double angdiff = (input_angle - steer_angle);
-  cout << "steer_angle: " << steer_angle << endl;
-  cout << "input_angle: " << input_angle << endl;
-  cout << "angdiff: " << angdiff << endl;
-  geometry_msgs::Twist ret_steer;
-  if(angdiff > 0){
-	ret_steer.angular.z = 1;
-	ret_steer.angular.x = fabs(angdiff);
-	return ret_steer;
-  }else if(angdiff < 0){
-	ret_steer.angular.z = -1;
-	ret_steer.angular.x = fabs(angdiff);
-	return ret_steer;
-  }else{
-	ret_steer.angular.z = 0;
-	ret_steer.angular.x = 0;
-	return ret_steer;
-  }
+	double angdiff = (input_angle - steer_angle);
+	cout << "steer_angle: " << steer_angle << endl;
+	cout << "input_angle: " << input_angle << endl;
+	cout << "angdiff: " << angdiff << endl;
+	geometry_msgs::Twist ret_steer;
+	if(angdiff > 0)
+	{
+		ret_steer.angular.z = 1;
+		ret_steer.angular.x = fabs(angdiff);
+		return ret_steer;
+	}
+	else if(angdiff < 0)
+	{
+		ret_steer.angular.z = -1;
+		ret_steer.angular.x = fabs(angdiff);
+		return ret_steer;
+	}
+	else
+	{
+		ret_steer.angular.z = 0;
+		ret_steer.angular.x = 0;
+		return ret_steer;
+	}
 
 }
 
