@@ -216,9 +216,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	  duty = MAX(duty, 32767);
 	  u2 = u1; u1 = duty; e2 = e1; e1 = e;
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
-	  //  cmd_ccmd.offset[1] = (int)(32767.0 + 29409.0*(rear_speed_m_s/MAX_LIN_VEL));
 	  cmd_ccmd.offset[1] = (int)(duty);
-	  //cout << "duty :" << duty << endl;
 	  runmode = FORWARD_MODE;
 	  if(ioctl(fd_imcs01, URBTC_COUNTER_SET) < 0){
 		ROS_WARN("URBTC_COUNTER_SET fail.");
@@ -227,7 +225,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 		ROS_WARN("imcs01 write fail.");
 	  }
 	  stasis_ = ROBOT_STASIS_FORWARD;
-	  //cout << "test1:" << cmd_ccmd.offset[1] << endl;
 	}else{ // Now Backing
 	  // Need to stop once.
 	  cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
@@ -243,7 +240,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){ 
 		ROS_WARN("imcs01 write fail.");
 	  }
-	  //cout <<  "test2" << cmd_ccmd.offset[1] << endl;
 	  if(forward_stop_cnt >= 20){
 		stasis_ = ROBOT_STASIS_FORWARD_STOP;
 		forward_stop_cnt = 0;
@@ -268,7 +264,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
 		ROS_WARN("imcs01 write fail.");
 	  }
-	  //cout <<  "test3" << cmd_ccmd.offset[1] << endl;
 	  stasis_ = ROBOT_STASIS_BACK;
 	}else{ // Now forwarding
 	  cmd_ccmd.offset[0] = 32767; // iMCs01 CH101 PIN2 is 0[V].  Backing flag.
@@ -280,7 +275,6 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	  if(write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd)) < 0){
 		ROS_WARN("imcs01 write fail.");
 	  }
-	  //	  cout <<  "test4" << cmd_ccmd.offset[1] << endl;
 	  if(back_stop_cnt >= 20){
 		stasis_ = ROBOT_STASIS_BACK_STOP;
 		back_stop_cnt = 0;
