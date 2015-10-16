@@ -503,10 +503,6 @@ void cirkit::ThirdRobotInterface::calculateOdometry()
   // std::cout << "----------" << std::endl;
 }
 
-void cirkit::ThirdRobotInterface::writeCmd(uin cmd)
-{
-	
-}
 
 void cirkit::ThirdRobotInterface::writeCmd(ccmd cmd)
 {
