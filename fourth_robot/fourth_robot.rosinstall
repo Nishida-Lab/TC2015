@@ -6,3 +6,7 @@
     local-name: fourth_robot/lrf_scan
     uri: https://github.com/RyodoTanaka/lrf_scan.git
     version: master
+- git:
+    local-name: fourth_robot/joy_twist
+    uri: https://github.com/RyodoTanaka/joy_twist.git
+    version: master
