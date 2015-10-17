@@ -34,12 +34,14 @@ private:
   double wheel_diameter_left;
   double max_linear_vel;
   double max_angular_vel;
+  double limit_vel_rate_right;
+  double limit_vel_rate_left;
+  double limit_vel_step_right;
+  double limit_vel_step_left;
   double gain_p_right;
   double gain_i_right;
-  double gain_d_right;
   double gain_p_left;
   double gain_i_left;
-  double gain_d_left;
   int motor_pin_right;
   int motor_pin_left;
   int enc_pin_right;
@@ -61,8 +63,8 @@ private:
   double delta_time;
   double delta_dist_right;
   double delta_dist_left;
-  double vel_right;
-  double vel_left;
+  double vel_right[2];
+  double vel_left[2];
   double max_vel_right;
   double max_vel_left;
 

@@ -22,8 +22,6 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   delta_time(0),
   delta_dist_right(0),
   delta_dist_left(0),
-  vel_right(0),
-  vel_left(0),
   fd(-1),
   port_name("/dev/urbtc0"),
   ros_rate(100),
@@ -33,12 +31,14 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   wheel_diameter_left(0.38695),
   max_linear_vel(1.1),
   max_angular_vel(M_PI),
+  limit_vel_rate_right(1.05),
+  limit_vel_rate_left(1.05),
+  limit_vel_step_right(100),
+  limit_vel_step_left(100),
   gain_p_right(1.0),
   gain_i_right(0),
-  gain_d_right(0),
   gain_p_left(1.0),
   gain_i_left(0),
-  gain_d_left(0),
   motor_pin_right(103),
   motor_pin_left(102),
   enc_pin_right(107),
@@ -46,8 +46,7 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   motor_pin_offset(101),
   enc_pin_offset(105),
   motor_pin_ch_right(1),
-  motor_pin_ch_left(2),
-  rc_filter_rate(0.9)
+  motor_pin_ch_left(2)
 {
   // ------ Get Params ------
   // robot property
@@ -59,13 +58,14 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   // control
   n.param("fourth_robot_driver/control/max_linear_vel", max_linear_vel, max_linear_vel);
   n.param("fourth_robot_driver/control/max_angular_vel", max_angular_vel, max_angular_vel);
+  n.param("fourth_robot_driver/control/limit_vel_rate_right", limit_vel_rate_right, limit_vel_rate_right);
+  n.param("fourth_robot_driver/control/limit_vel_rate_left", limit_vel_rate_left, limit_vel_rate_left);
+  n.param("fourth_robot_driver/control/limit_vel_step_right", limit_vel_step_right, limit_vel_step_right);
+  n.param("fourth_robot_driver/control/limit_vel_step_left", limit_vel_step_left, limit_vel_step_left);
   n.param("fourth_robot_driver/control/gain_p_right", gain_p_right, gain_p_right);
   n.param("fourth_robot_driver/control/gain_i_right", gain_i_right, gain_i_right);
-  n.param("fourth_robot_driver/control/gain_d_right", gain_d_right, gain_d_right);
   n.param("fourth_robot_driver/control/gain_p_left", gain_p_left, gain_p_left);
   n.param("fourth_robot_driver/control/gain_i_left", gain_i_left, gain_i_left);
-  n.param("fourth_robot_driver/control/gain_d_left", gain_d_left, gain_d_left);
-  n.param("fourth_robot_driver/control/rc_filter_rate", rc_filter_rate, rc_filter_rate);
   // iMCs01
   n.param("fourth_robot_driver/imcs01/port_name", port_name, port_name);
   n.param("fourth_robot_driver/imcs01/motor_pin_right", motor_pin_right, motor_pin_right);
@@ -78,6 +78,11 @@ FourthRobotDriver::FourthRobotDriver(ros::NodeHandle &n):
   // 100 means max rpm of the motor unit (BLH230K-30)
   max_vel_right = wheel_diameter_right * M_PI * 100.0/60.0;
   max_vel_left = wheel_diameter_left * M_PI * 100.0/60.0;
+  // velocity
+  for(int i=0; i<2; i++){
+	vel_right[i] = 0;
+	vel_left[i] = 0;
+  }
   // ------ finish to prepare for motor control ------
   
   // ------ iMCs01 ------
@@ -322,29 +327,19 @@ void FourthRobotDriver::culcurateVelocity(nav_msgs::Odometry &odom){
   //   current : 0
   //   last    : 1
   // ------------------
-  static double rcf_vel_right[2] = {0, 0};
-  static double rcf_vel_left[2] = {0, 0};
   double linear_vel;
   double angular_vel;
-  static int cnt = 0;
-  
+ 
   // ------ update current data ------
   // get raw data
-  rcf_vel_right[0] = delta_dist_right / delta_time;
-  rcf_vel_left[0] = delta_dist_left / delta_time;
-  // RC filter (y[k] = a*y[k-1] + (1-a)*x[k])
-  // vel_right = rc_filter_rate*rcf_vel_right[1] + (1.0-rc_filter_rate)*rcf_vel_right[0];
-  // vel_left = rc_filter_rate*rcf_vel_left[1] + (1.0-rc_filter_rate)*rcf_vel_left[0];
-  vel_right = rcf_vel_right[0];
-  vel_left = rcf_vel_left[0];
-  cout << cnt << "\t" << delta_time << "\t" << vel_left << endl;
-  cnt++;
+  vel_right[0] = delta_dist_right / delta_time;
+  vel_left[0] = delta_dist_left / delta_time;
   // ------ finish to update current data ------
 
   // ------ update output data ------
   // culculate linear and angular velocity
-  linear_vel = (vel_right + vel_left)/2.0;
-  angular_vel = (vel_right - vel_left)/tread;
+  linear_vel = (vel_right[0] + vel_left[0])/2.0;
+  angular_vel = (vel_right[0] - vel_left[0])/tread;
   // input to odom data
   odom.twist.twist.linear.x = linear_vel;
   odom.twist.twist.linear.y = 0;
@@ -355,45 +350,100 @@ void FourthRobotDriver::culcurateVelocity(nav_msgs::Odometry &odom){
   // ------ finish to update output data ------
 
   // ------ update past data ------
-  rcf_vel_right[1] = vel_right;
-  rcf_vel_left[1] = vel_right;
+  vel_right[1] = vel_right[0];
+  vel_left[1] = vel_left[0];
   // ------ finish to update past data ------
 }
 
-int FourthRobotDriver::Drive(const geometry_msgs::Twist cmd)
+int FourthRobotDriver::Drive(geometry_msgs::Twist cmd)
 {
   double target_vel_right = 0;
   double target_vel_left = 0;
   bool brake = false;
+
+  if(abs(cmd.linear.x) > abs(max_linear_vel))
+	cmd.linear.x = max_linear_vel;
+  if(abs(cmd.angular.z) > abs(max_angular_vel))
+	cmd.angular.z = max_angular_vel;
   
   if(cmd.linear.x == 0 && cmd.angular.z == 0)
 	brake = true;
 	
   target_vel_right = (2.0*cmd.linear.x + tread*cmd.angular.z)/2.0;
   target_vel_left = (2.0*cmd.linear.x - tread*cmd.angular.z)/2.0;
-  
+   
   return driveDirect(target_vel_right, target_vel_left, brake);
 }
 
 int FourthRobotDriver::driveDirect(double target_vel_right, double target_vel_left, bool brake)
 {
-  double input_vel_right;
-  double input_vel_left;
+  // for brake input
   unsigned char input_brake = SET_BREAKS;
+  // for I-P control
+  // ------ Rule ------
+  //   current : 0
+  //   last    : 1
+  // ------------------
+  static double control_input_vel_right[2] = {0, 0};
+  static double control_input_vel_left[2] = {0, 0};
+  static double error_vel_right[2] = {0, 0};
+  static double error_vel_left[2] = {0, 0};
+  static int over_vel_cnt_right = 0;
+  static int over_vel_cnt_left = 0;
+  static int cnt = 0;
 
-  // input_vel_right = target_vel_right;
-  // input_vel_left = target_vel_left;
-
-  input_vel_right = max_vel_right;
-  input_vel_left = max_vel_left;
+  // ------ update current data ------  
+  // error vel
+  error_vel_right[0] = target_vel_right - vel_right[0];
+  error_vel_left[0] = target_vel_left - vel_left[0];
+  // control vel
+  control_input_vel_right[0] = control_input_vel_right[1] + gain_p_right*(vel_right[0]-vel_right[1]) + (1.0/2.0)*gain_i_right*(error_vel_right[0]+error_vel_right[1]);
+  control_input_vel_left[0] = control_input_vel_left[1] + gain_p_left*(vel_left[0]-vel_left[1]) + (1.0/2.0)*gain_i_left*(error_vel_left[0]+error_vel_left[1]);
+  // ------ finish to update current data ------
   
-  if(brake)
-	input_brake = input_brake | motor_pin_ch_right | motor_pin_ch_left;
+  // ------ update last data ------
+  // error vel
+  error_vel_right[1] = error_vel_right[0];
+  error_vel_left[1] = error_vel_left[0]; 
+  // control vel
+  control_input_vel_right[1] = control_input_vel_right[0];
+  control_input_vel_left[1] = control_input_vel_left[0];
+  // ------ finish to update last data ------
+  
+  // ------ control reduce input using brake ------
+  // check velocity over
+  if(abs(vel_right[0]) > abs(target_vel_right)*limit_vel_rate_right)
+	over_vel_cnt_right++;
+  else
+	over_vel_cnt_right = 0;
+  if(abs(vel_left[0]) > abs(target_vel_left)*limit_vel_rate_left)
+	over_vel_cnt_left++;
+  else
+	over_vel_cnt_left = 0;
+  // if the velocity keep being over than threshold
+  if(over_vel_cnt_right > limit_vel_step_right){
+	input_brake = input_brake | motor_pin_ch_right;
+	over_vel_cnt_right = 0;
+	control_input_vel_right[1] = 0;
+  }
+  if(over_vel_cnt_left > limit_vel_step_left){
+	input_brake = input_brake | motor_pin_ch_left;
+	over_vel_cnt_left = 0;
+	control_input_vel_left[1] = 0;
+  }
+  // ------ finish to control reduce input ------
 
+  // control emergency brake  
+  if(brake){
+	input_brake = input_brake | motor_pin_ch_right | motor_pin_ch_left;
+	control_input_vel_right[1] = 0;
+	control_input_vel_left[1] = 0;
+  }
+  
   // ------ write input datas to iMCs01 ------
   // culculate input data
-  cmd_ccmd.offset[motor_pin_right] =  (int)(0x7fff - 0x7fff*(input_vel_right/max_vel_right)); 
-  cmd_ccmd.offset[motor_pin_left] = (int)(0x7fff + 0x7fff*(input_vel_left/max_vel_left));
+  cmd_ccmd.offset[motor_pin_right] =  (int)(0x7fff - 0x7fff*(control_input_vel_right[0]/max_vel_right)); 
+  cmd_ccmd.offset[motor_pin_left] = (int)(0x7fff + 0x7fff*(control_input_vel_left[0]/max_vel_left));
   cmd_ccmd.breaks = input_brake;
   // write
   if(ioctl(fd, URBTC_COUNTER_SET) < 0)
