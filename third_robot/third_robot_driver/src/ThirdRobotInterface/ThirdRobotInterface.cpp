@@ -214,7 +214,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	static double e2 = 0;
 
 	static double gain_p = 10000.0;
-	static double gain_i = 10000.0;
+	static double gain_i = 100000.0;
 	static double gain_d = 1000.0;
 
 	double duty = 0;
