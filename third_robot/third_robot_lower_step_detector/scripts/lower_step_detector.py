@@ -16,16 +16,16 @@ from sensor_msgs.msg import LaserScan
 NAME_NODE = 'lower_step_detector'
 
 class LaserScanEx():
-    thresholds = 0
-    angles_laser_rad = 0
-    angles_laser_deg = 0
-    angles_laser_to_calc_intensity = 0
+    threshold_intensity = 0
+    angle_laser_rad = 0
+    angle_laser_deg = 0
+    angle_laser_to_calc_intensity = 0
 
     def __init__(self):
-        __thresholds = 0
-        __angles_laser_rad = 0
-        __angles_laser_deg = 0
-        __angles_laser_to_calc_intensity = 0
+        __threshold = 0
+        __angle_laser_rad = 0
+        __angle_laser_deg = 0
+        __angle_laser_to_calc_intensity = 0
 
 class LowerStepDetector():
     ## public constants
@@ -70,7 +70,7 @@ class LowerStepDetector():
 
     __is_init = True
 
-    __laser_scan_exs = 0
+    __laser_scan_exs = []
 
     __thresholds = 0
     __angles_laser_rad = 0
@@ -114,14 +114,14 @@ class LowerStepDetector():
         detect_index_max = math.radians(self.__detect_step_angle_max_deg) / angle_increment
         detect_index_mid = math.radians(self.__detect_angle_center_deg) / angle_increment
 
+        # calculate threshold only when it's the first time
         if self.__is_init == True:
+
             self.__thresholds = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
             self.__angles_laser_to_calc_intensity = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
             self.__angles_laser_rad = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
             self.__angles_laser_deg = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
 
-        # calculate threshold only when it's the first time
-        if self.__is_init == True:
             for i in range(len(laser_sensor_msg_ori.ranges)):
                 # skip when a range cannot detect down step
                 if i < detect_index_min or i > detect_index_max:
@@ -145,6 +145,13 @@ class LowerStepDetector():
                     continue
                 laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
                 self.__thresholds[i] = laser_intensity_thresh
+
+                laser_scan_ex = LaserScanEx()
+                laser_scan_ex.angle_laser_rad = angle_curr_rad
+                laser_scan_ex.angle_laser_deg = angle_curr_deg
+                laser_scan_ex.angle_laser_to_calc_intensity = theta
+                laser_scan_ex.threshold_intensity = laser_intensity_thresh
+                self.__laser_scan_exs.append(laser_scan_ex)
 
         for i in range(len(laser_sensor_msg_ori.ranges)):
             # copy original data
