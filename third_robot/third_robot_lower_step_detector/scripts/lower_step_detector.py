@@ -15,6 +15,18 @@ from sensor_msgs.msg import LaserScan
 
 NAME_NODE = 'lower_step_detector'
 
+class LaserScanEx():
+    thresholds = 0
+    angles_laser_rad = 0
+    angles_laser_deg = 0
+    angles_laser_to_calc_intensity = 0
+
+    def __init__(self):
+        __thresholds = 0
+        __angles_laser_rad = 0
+        __angles_laser_deg = 0
+        __angles_laser_to_calc_intensity = 0
+
 class LowerStepDetector():
     ## public constants
     # topic names
@@ -58,7 +70,12 @@ class LowerStepDetector():
 
     __is_init = True
 
+    __laser_scan_exs = 0
+
     __thresholds = 0
+    __angles_laser_rad = 0
+    __angles_laser_deg = 0
+    __angles_laser_to_calc_intensity = 0
 
     ## constructor
     def __init__(self):
@@ -99,6 +116,35 @@ class LowerStepDetector():
 
         if self.__is_init == True:
             self.__thresholds = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
+            self.__angles_laser_to_calc_intensity = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
+            self.__angles_laser_rad = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
+            self.__angles_laser_deg = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
+
+        # calculate threshold only when it's the first time
+        if self.__is_init == True:
+            for i in range(len(laser_sensor_msg_ori.ranges)):
+                # skip when a range cannot detect down step
+                if i < detect_index_min or i > detect_index_max:
+                    continue
+
+                angle_curr_rad = i * angle_increment
+                angle_curr_deg = math.degrees(angle_curr_rad)
+
+                if i < detect_index_mid:
+                    theta = angle_curr_rad
+                else:
+                    theta = math.pi - angle_curr_rad
+
+                # copy calculated values to members
+                self.__angles_laser_rad[i] = angle_curr_rad
+                self.__angles_laser_deg[i] = angle_curr_deg
+                self.__angles_laser_to_calc_intensity[i] = theta
+
+                # to avoid zero division
+                if theta == 0:
+                    continue
+                laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
+                self.__thresholds[i] = laser_intensity_thresh
 
         for i in range(len(laser_sensor_msg_ori.ranges)):
             # copy original data
@@ -106,20 +152,11 @@ class LowerStepDetector():
             # skip when a range cannot detect down step
             if i < detect_index_min or i > detect_index_max:
                 continue
-            angle_curr_rad = i * angle_increment
-            angle_curr_deg = math.degrees(angle_curr_rad)
-            if i < detect_index_mid:
-                theta = angle_curr_rad
-            else:
-                theta = math.pi - angle_curr_rad
-            # overwrite only when range can detect down step
-            if self.__is_init == True:
-                laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
-                self.__thresholds[i] = laser_intensity_thresh
 
+            # overwrite only when range can detect down step
             if laser_sensor_msg_ori.ranges[i] > self.__thresholds[i]:#laser_intensity_thresh:
-                print 'detected lower step at %f[degree]! new3' % angle_curr_deg
-                tmp_fix_data[i] = self.__virtual_laser_intensity / math.sin(theta)
+                print 'detected lower step at %f[degree]! new3' % self.__angles_laser_deg[i]
+                tmp_fix_data[i] = self.__virtual_laser_intensity / math.sin(self.__angles_laser_to_calc_intensity[i]) #math.sin(theta)
 
         if self.__is_init == True:
             self.__is_init = False

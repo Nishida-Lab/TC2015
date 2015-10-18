@@ -26,8 +26,8 @@
       <file leaf-file-name="lower_step_detector.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6616541">
-              <caret line="119" column="62" selection-start-line="119" selection-start-column="62" selection-end-line="119" selection-end-column="62" />
+            <state vertical-scroll-proportion="0.4861111">
+              <caret line="123" column="34" selection-start-line="123" selection-start-column="34" selection-end-line="123" selection-end-column="34" />
               <folding>
                 <element signature="e#149#161#0" expanded="true" />
               </folding>
@@ -291,9 +291,9 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37756202" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4963274" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21720882" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33892968" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33892968" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -322,35 +322,21 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
-          <line>127</line>
+          <line>164</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
-          <line>129</line>
+          <line>166</line>
           <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="37" />
+      <option name="time" value="39" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="message" language="Python" />
-        <watch expression="message.ranges" language="Python" />
-        <watch expression="len(message.ranges)" language="Python" />
-        <watch expression="id(laser_sensor_msg_fix)" language="Python" />
-        <watch expression="id(laser_sensor_msg_ori)" language="Python" />
-        <watch expression="id(laser_sensor_msg_fix.ranges[i])" language="Python" />
-        <watch expression="id(laser_sensor_msg_ori.ranges[i])" language="Python" />
-        <watch expression="laser_sensor_msg_ori.ranges[i]" language="Python" />
-        <watch expression="id(tmp_fix_data)" language="Python" />
-        <watch expression="id(laser_sensor_msg_fix.ranges)" language="Python" />
-        <watch expression="id(laser_sensor_msg_ori.ranges)" language="Python" />
-        <watch expression="laser_sensor_msg_fix.ranges" language="Python" />
-        <watch expression="argvs" language="Python" />
-        <watch expression="self" language="Python" />
-        <watch expression="self.__is_init" language="Python" />
-        <watch expression="self.__intensity_extend" language="Python" />
+        <watch expression="self.__angles_laser_to_calc_intensity" language="Python" />
+        <watch expression="i" language="Python" />
       </configuration>
     </watches-manager>
   </component>
@@ -395,6 +381,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="755" column="0" selection-start-line="755" selection-start-column="0" selection-end-line="755" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -420,6 +407,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="755" column="0" selection-start-line="755" selection-start-column="0" selection-end-line="755" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -452,6 +440,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="755" column="0" selection-start-line="755" selection-start-column="0" selection-end-line="755" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -487,8 +476,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6616541">
-          <caret line="119" column="62" selection-start-line="119" selection-start-column="62" selection-end-line="119" selection-end-column="62" />
+        <state vertical-scroll-proportion="0.4861111">
+          <caret line="123" column="34" selection-start-line="123" selection-start-column="34" selection-end-line="123" selection-end-column="34" />
           <folding>
             <element signature="e#149#161#0" expanded="true" />
           </folding>
