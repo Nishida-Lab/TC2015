@@ -1,16 +1,18 @@
 #!/usr/bin/env python
+# coding: utf-8
 
-## @package third_robot_lower_step_detector
-#  fix original laser scan data to detect down step 
-#
-#  @author Masaru Morita 
+"""
+fix original laser scan data to detect down step
+"""
+__author__  = "MasaruMorita <p595201m@mail.kyutech.jp>"
+__version__ = "1.01"
+__date__    = "18 Oct 2015"
 
 import rospy
 import copy
 import math
 import sys
 import numpy as np
-from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
 
 NAME_NODE = 'lower_step_detector'
@@ -20,12 +22,14 @@ class LaserScanEx():
     angle_laser_rad = 0
     angle_laser_deg = 0
     angle_laser_to_calc_intensity = 0
+    is_beyond_threshold = False
 
     def __init__(self):
-        __threshold = 0
-        __angle_laser_rad = 0
-        __angle_laser_deg = 0
-        __angle_laser_to_calc_intensity = 0
+        self.threshold = 0
+        self.angle_laser_rad = 0
+        self.angle_laser_deg = 0
+        self.angle_laser_to_calc_intensity = 0
+        self.is_beyond_threshold = False
 
 class LowerStepDetector():
     ## public constants
@@ -47,35 +51,23 @@ class LowerStepDetector():
     DEFAULT_DETECT_STEP_ANGLE_MIN_DEG = 10.0
 
     ## private member variables
-    ## @var __laser_ori_sub
     # original laser scan subscriber
     __laser_ori_sub = 0
-    ## @var __laser_fix_pub
     # fixed laser scan publisher
     __laser_fix_pub = 0
-    ##
     __laser_intensity_max = 0
-    ##
     __virtual_laser_intensity = 0
-    ##
+    __detect_index_min = 0
+    __detect_index_max = 0
+    #
     __laser_scan_range_deg = 0
-    ##
     __detect_step_angle_min_deg = 0
-    ##
     __detect_step_angle_max_deg = 0
-    ##
     __detect_angle_center_deg = 0
-    ##
     __margin_between_plane_and_down_step = 0
-
+    #
     __is_init = True
-
     __laser_scan_exs = []
-
-    __thresholds = 0
-    __angles_laser_rad = 0
-    __angles_laser_deg = 0
-    __angles_laser_to_calc_intensity = 0
 
     ## constructor
     def __init__(self):
@@ -104,72 +96,68 @@ class LowerStepDetector():
         self.__detect_step_angle_max_deg = self.__laser_scan_range_deg - self.__detect_step_angle_min_deg
         self.__detect_angle_center_deg = self.__laser_scan_range_deg / 2.0
 
+    def calculate_threshold_intensity(self, laser_sensor_msg_ori):
+         # calculate parameters
+         angle_increment = laser_sensor_msg_ori.angle_increment
+         self.__detect_index_min = math.radians(self.__detect_step_angle_min_deg) / angle_increment
+         self.__detect_index_max = math.radians(self.__detect_step_angle_max_deg) / angle_increment
+         detect_index_mid = math.radians(self.__detect_angle_center_deg) / angle_increment
+
+         for i in range(len(laser_sensor_msg_ori.ranges)):
+             laser_scan_ex = LaserScanEx()
+
+             angle_curr_rad = i * angle_increment
+             angle_curr_deg = math.degrees(angle_curr_rad)
+
+             if i < detect_index_mid:
+                 theta = angle_curr_rad
+             else:
+                 theta = math.pi - angle_curr_rad
+
+             # to avoid zero division
+             if theta != 0:
+                 laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
+             else:
+                 laser_intensity_thresh = float("inf")
+
+             laser_scan_ex.angle_laser_rad = angle_curr_rad
+             laser_scan_ex.angle_laser_deg = angle_curr_deg
+             laser_scan_ex.angle_laser_to_calc_intensity = theta
+
+             # beyond the extend of step scan
+             if i < self.__detect_index_min or i > self.__detect_index_max:
+                 laser_scan_ex.threshold_intensity = float("inf")
+             else:
+                 laser_scan_ex.threshold_intensity = laser_intensity_thresh
+             self.__laser_scan_exs.append(laser_scan_ex)
+
     def on_subscribe_laser_scan(self, laser_sensor_msg_ori):
         laser_sensor_msg_fix = copy.deepcopy(laser_sensor_msg_ori)
         # temporary buffer for publish. This is because tuple(type of LaserScan.ranges) type can't be overwritten.
         tmp_fix_data = len(laser_sensor_msg_ori.ranges)*[0]
-        # calculate parameters
-        angle_increment = laser_sensor_msg_ori.angle_increment
-        detect_index_min = math.radians(self.__detect_step_angle_min_deg) / angle_increment
-        detect_index_max = math.radians(self.__detect_step_angle_max_deg) / angle_increment
-        detect_index_mid = math.radians(self.__detect_angle_center_deg) / angle_increment
 
         # calculate threshold only when it's the first time
         if self.__is_init == True:
+            # reset initial flag
             self.__is_init = False
-            self.__thresholds = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
-            self.__angles_laser_to_calc_intensity = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
-            self.__angles_laser_rad = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
-            self.__angles_laser_deg = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
-
-            for i in range(len(laser_sensor_msg_ori.ranges)):
-                laser_scan_ex = LaserScanEx()
-
-                angle_curr_rad = i * angle_increment
-                angle_curr_deg = math.degrees(angle_curr_rad)
-
-                if i < detect_index_mid:
-                    theta = angle_curr_rad
-                else:
-                    theta = math.pi - angle_curr_rad
-
-                # copy calculated values to members
-                self.__angles_laser_rad[i] = angle_curr_rad
-                self.__angles_laser_deg[i] = angle_curr_deg
-                self.__angles_laser_to_calc_intensity[i] = theta
-
-                # to avoid zero division
-                if theta == 0:
-                    continue
-                laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
-                self.__thresholds[i] = laser_intensity_thresh
-
-                laser_scan_ex.angle_laser_rad = angle_curr_rad
-                laser_scan_ex.angle_laser_deg = angle_curr_deg
-                laser_scan_ex.angle_laser_to_calc_intensity = theta
-
-                # beyond the extend of step scan
-                if i < detect_index_min or i > detect_index_max:
-                    laser_scan_ex.threshold_intensity = float("inf")
-                else:
-                    laser_scan_ex.threshold_intensity = laser_intensity_thresh
-                self.__laser_scan_exs.append(laser_scan_ex)
+            self.calculate_threshold_intensity(laser_sensor_msg_ori)
 
         for i in range(len(laser_sensor_msg_ori.ranges)):
             # copy original data
             tmp_fix_data[i] = copy.deepcopy(laser_sensor_msg_ori.ranges[i])
             # skip when a range cannot detect down step
-            if i < detect_index_min or i > detect_index_max:
+            if i < self.__detect_index_min or i > self.__detect_index_max:
                 continue
 
             # overwrite only when range can detect down step
-            if laser_sensor_msg_ori.ranges[i] > self.__laser_scan_exs[i].threshold_intensity: #self.__thresholds[i]:#laser_intensity_thresh:
-                print 'detected lower step at %f[degree]! new3' % self.__laser_scan_exs[i].angle_laser_deg#__angles_laser_deg[i]
-                tmp_fix_data[i] = self.__virtual_laser_intensity / math.sin(self.__laser_scan_exs[i].angle_laser_to_calc_intensity)
-                 #math.sin(theta)
+            if laser_sensor_msg_ori.ranges[i] > self.__laser_scan_exs[i].threshold_intensity:
+                print 'detected lower step at %f[degree]!' % self.__laser_scan_exs[i].angle_laser_deg
+                self.__laser_scan_exs[i].is_beyond_threshold = True
+            else:
+                self.__laser_scan_exs[i].is_beyond_threshold = False
 
-        if self.__is_init == True:
-            self.__is_init = False
+            if self.__laser_scan_exs[i].is_beyond_threshold == True:
+                tmp_fix_data[i] = self.__virtual_laser_intensity / math.sin(self.__laser_scan_exs[i].angle_laser_to_calc_intensity)
 
         # create & register temporary tuple buffer to publishing buffer
         laser_sensor_msg_fix.ranges = tuple(tmp_fix_data)

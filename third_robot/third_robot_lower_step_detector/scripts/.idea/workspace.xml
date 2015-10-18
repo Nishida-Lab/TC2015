@@ -26,10 +26,10 @@
       <file leaf-file-name="lower_step_detector.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7037037">
-              <caret line="165" column="140" selection-start-line="165" selection-start-column="140" selection-end-line="165" selection-end-column="140" />
+            <state vertical-scroll-proportion="0.4212963">
+              <caret line="147" column="50" selection-start-line="147" selection-start-column="50" selection-end-line="147" selection-end-column="50" />
               <folding>
-                <element signature="e#149#161#0" expanded="true" />
+                <element signature="e#202#214#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -322,7 +322,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
-          <line>159</line>
+          <line>146</line>
           <option name="timeStamp" value="40" />
         </line-breakpoint>
       </breakpoints>
@@ -341,7 +341,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#149#161#0" expanded="true" />
+            <element signature="e#202#214#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -359,7 +359,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#149#161#0" expanded="true" />
+            <element signature="e#202#214#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -385,7 +385,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#149#161#0" expanded="true" />
+            <element signature="e#202#214#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -411,7 +411,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#149#161#0" expanded="true" />
+            <element signature="e#202#214#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -471,10 +471,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7037037">
-          <caret line="165" column="140" selection-start-line="165" selection-start-column="140" selection-end-line="165" selection-end-column="140" />
+        <state vertical-scroll-proportion="0.4212963">
+          <caret line="147" column="50" selection-start-line="147" selection-start-column="50" selection-end-line="147" selection-end-column="50" />
           <folding>
-            <element signature="e#149#161#0" expanded="true" />
+            <element signature="e#202#214#0" expanded="true" />
           </folding>
         </state>
       </provider>
