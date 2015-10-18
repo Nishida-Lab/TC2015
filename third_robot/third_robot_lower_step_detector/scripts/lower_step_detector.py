@@ -105,7 +105,7 @@ class LowerStapDetector():
             else:
                 theta = math.pi - angle_curr_rad
             # overwrite only when range can detect down step
-            laseer_intensity_threash = self.__laser_intensity_max / math.sin(theta) + self.__margine_between_plane_and_down_step
+            laseer_intensity_threash = (self.__laser_intensity_max + self.__margine_between_plane_and_down_step) / math.sin(theta)
             if laser_sensor_msg_ori.ranges[i] > laseer_intensity_threash:
                 print 'detected lower step at %f[degree]! new3' % angle_curr_deg
                 tmp_fix_data[i] = self.__virtual_laser_intensity / math.sin(theta)
