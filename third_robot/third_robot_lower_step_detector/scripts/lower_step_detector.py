@@ -9,6 +9,7 @@ import rospy
 import copy
 import math
 import sys
+import numpy as np
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
 
@@ -55,6 +56,10 @@ class LowerStepDetector():
     ##
     __margin_between_plane_and_down_step = 0
 
+    __is_init = True
+
+    __thresholds = 0
+
     ## constructor
     def __init__(self):
         rospy.init_node(NAME_NODE, anonymous=False)
@@ -92,6 +97,9 @@ class LowerStepDetector():
         detect_index_max = math.radians(self.__detect_step_angle_max_deg) / angle_increment
         detect_index_mid = math.radians(self.__detect_angle_center_deg) / angle_increment
 
+        if self.__is_init == True:
+            self.__thresholds = np.array(len(laser_sensor_msg_ori.ranges) * [0.0])
+
         for i in range(len(laser_sensor_msg_ori.ranges)):
             # copy original data
             tmp_fix_data[i] = copy.deepcopy(laser_sensor_msg_ori.ranges[i])
@@ -105,10 +113,16 @@ class LowerStepDetector():
             else:
                 theta = math.pi - angle_curr_rad
             # overwrite only when range can detect down step
-            laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
-            if laser_sensor_msg_ori.ranges[i] > laser_intensity_thresh:
+            if self.__is_init == True:
+                laser_intensity_thresh = self.__laser_intensity_max / math.sin(theta) + self.__margin_between_plane_and_down_step
+                self.__thresholds[i] = laser_intensity_thresh
+
+            if laser_sensor_msg_ori.ranges[i] > self.__thresholds[i]:#laser_intensity_thresh:
                 print 'detected lower step at %f[degree]! new3' % angle_curr_deg
                 tmp_fix_data[i] = self.__virtual_laser_intensity / math.sin(theta)
+
+        if self.__is_init == True:
+            self.__is_init = False
 
         # create & register temporary tuple buffer to publishing buffer
         laser_sensor_msg_fix.ranges = tuple(tmp_fix_data)
