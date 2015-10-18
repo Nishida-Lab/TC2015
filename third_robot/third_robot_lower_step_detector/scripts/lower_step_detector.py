@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @package third_ronot_lower_step_detector
+## @package third_robot_lower_step_detector
 #  fix original laser scan data to detect down step 
 #
 #  @author Masaru Morita 
@@ -84,7 +84,7 @@ class LowerStepDetector():
 
     def on_subscribe_laser_scan(self, laser_sensor_msg_ori):
         laser_sensor_msg_fix = copy.deepcopy(laser_sensor_msg_ori)
-        # temporary buffer for publish. This is because tuple(type of LaerScan.ranges) type cann't be overwritten.
+        # temporary buffer for publish. This is because tuple(type of LaserScan.ranges) type can't be overwritten.
         tmp_fix_data = len(laser_sensor_msg_ori.ranges)*[0]
         # calculate parameters
         angle_increment = laser_sensor_msg_ori.angle_increment
