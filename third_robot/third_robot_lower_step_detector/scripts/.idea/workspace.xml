@@ -26,8 +26,8 @@
       <file leaf-file-name="lower_step_detector.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.41666666">
-              <caret line="153" column="59" selection-start-line="153" selection-start-column="59" selection-end-line="153" selection-end-column="59" />
+            <state vertical-scroll-proportion="0.7037037">
+              <caret line="165" column="140" selection-start-line="165" selection-start-column="140" selection-end-line="165" selection-end-column="140" />
               <folding>
                 <element signature="e#149#161#0" expanded="true" />
               </folding>
@@ -319,7 +319,14 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="39" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/lower_step_detector.py</url>
+          <line>159</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="41" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -464,8 +471,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lower_step_detector.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41666666">
-          <caret line="153" column="59" selection-start-line="153" selection-start-column="59" selection-end-line="153" selection-end-column="59" />
+        <state vertical-scroll-proportion="0.7037037">
+          <caret line="165" column="140" selection-start-line="165" selection-start-column="140" selection-end-line="165" selection-end-column="140" />
           <folding>
             <element signature="e#149#161#0" expanded="true" />
           </folding>
