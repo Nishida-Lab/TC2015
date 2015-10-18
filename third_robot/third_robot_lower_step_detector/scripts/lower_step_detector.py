@@ -199,7 +199,7 @@ class LowerStepDetector():
             self.__chunks_to_detect_noise.append(chunk_angle)
 
     # first intensity judge. before analyzing intensity
-    def judge_intensity_first(self, i_laser_sensor_msg_ori):
+    def judge_intensity(self, i_laser_sensor_msg_ori):
         for i in range(len(i_laser_sensor_msg_ori.ranges)):
             # skip when a range cannot detect down step
             if i < self.__detect_index_min or i > self.__detect_index_max:
@@ -211,6 +211,12 @@ class LowerStepDetector():
                 self.__laser_scan_exs[i].is_beyond_threshold_before = True
             else:
                 self.__laser_scan_exs[i].is_beyond_threshold_before = False
+
+    # second intensity judge. analyzing intensity for noise detect
+    def analyze_intensity_noise_detect(self, i_tmp_fix_data):
+        for j in range(len(self.__chunks_to_detect_noise)):
+            self.__chunks_to_detect_noise[j].judge_beyond_thresh(self.__laser_scan_exs)
+            self.__chunks_to_detect_noise[j].update_intensity(i_tmp_fix_data, self.__laser_scan_exs)
 
     def on_subscribe_laser_scan(self, i_laser_sensor_msg_ori):
         laser_sensor_msg_fix = copy.deepcopy(i_laser_sensor_msg_ori)
@@ -228,12 +234,11 @@ class LowerStepDetector():
             # copy original data
             tmp_fix_data[i] = copy.deepcopy(i_laser_sensor_msg_ori.ranges[i])
 
-        self.judge_intensity_first(i_laser_sensor_msg_ori)
+        # judge laser scan data before noise detect
+        self.judge_intensity(i_laser_sensor_msg_ori)
 
         # analyze laser scan data to consider noise
-        for j in range(len(self.__chunks_to_detect_noise)):
-            self.__chunks_to_detect_noise[j].judge_beyond_thresh(self.__laser_scan_exs)
-            self.__chunks_to_detect_noise[j].update_intensity(tmp_fix_data, self.__laser_scan_exs)
+        self.analyze_intensity_noise_detect(tmp_fix_data)
 
         laser_sensor_msg_fix.ranges = tuple(tmp_fix_data)
 
