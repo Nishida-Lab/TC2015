@@ -40,6 +40,8 @@ cirkit::ThirdRobotInterface::~ThirdRobotInterface()
   //  cout << "Destructor called\n" << endl;
   cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
   cmd_ccmd.offset[1] = 32767; // STOP
+  cmd_ccmd.offset[2] = 32767;
+  cmd_ccmd.offset[3] = 32767;
   ioctl(fd_imcs01, URBTC_COUNTER_SET);
   write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd));
 
