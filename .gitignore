@@ -6,3 +6,6 @@
 *.un~
 Session.vim
 .netrwhist
+
+# pycharm
+workspace.xml
