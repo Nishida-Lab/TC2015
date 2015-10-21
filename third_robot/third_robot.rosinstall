@@ -1,0 +1,4 @@
+- git:
+	local-name: ira_laser_tools
+	uri: https://github.com/iralabdisco/ira_laser_tools.git
+	version: master
