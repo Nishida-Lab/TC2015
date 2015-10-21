@@ -316,8 +316,8 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	// front_angular	: target angle[deg];
 	// steer_angle	: now angle[deg];
 	double input_angle = 0;
-	input_angle = MAX(front_angular, -45.0);
-	input_angle = MIN(input_angle, 45.0);
+	input_angle = MAX(front_angular, -55.0);
+	input_angle = MIN(input_angle, 55.0);
 	//ROS_INFO("input angle : %lf\n", input_angle);
 
 	double angdiff = (input_angle - steer_angle);
