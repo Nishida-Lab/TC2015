@@ -40,6 +40,8 @@ cirkit::ThirdRobotInterface::~ThirdRobotInterface()
   //  cout << "Destructor called\n" << endl;
   cmd_ccmd.offset[0] = 65535; // iMCs01 CH101 PIN2 is 5[V]. Forwarding flag.
   cmd_ccmd.offset[1] = 32767; // STOP
+  cmd_ccmd.offset[2] = 32767;
+  cmd_ccmd.offset[3] = 32767;
   ioctl(fd_imcs01, URBTC_COUNTER_SET);
   write(fd_imcs01, &cmd_ccmd, sizeof(cmd_ccmd));
 
@@ -178,12 +180,12 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
   else
   {
 	front_angle_deg = angular_speed*(180.0/M_PI);
-	cout << "front_angle_deg : " << front_angle_deg << endl;
+	//cout << "front_angle_deg : " << front_angle_deg << endl;
   }
   // Rear wheel velocity in [m/s]
   double rear_speed_m_s = linear_speed;
 
-  cout <<  " target_rear_speed_ms : " << rear_speed_m_s << endl;
+  //cout <<  " target_rear_speed_ms : " << rear_speed_m_s << endl;
 
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
@@ -214,7 +216,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	static double e2 = 0;
 
 	static double gain_p = 10000.0;
-	static double gain_i = 10000.0;
+	static double gain_i = 100000.0;
 	static double gain_d = 1000.0;
 
 	double duty = 0;
@@ -318,7 +320,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	double input_angle = 0;
 	input_angle = MAX(front_angular, -45.0);
 	input_angle = MIN(input_angle, 45.0);
-
+	//ROS_INFO("input angle : %lf\n", input_angle);
 
 	double angdiff = (input_angle - steer_angle);
 	// cout << "steer_angle: " << steer_angle << endl;
@@ -342,7 +344,7 @@ int cirkit::ThirdRobotInterface::getEncoderPacket()
 // Parse encoder data
 int cirkit::ThirdRobotInterface::parseEncoderPackets()
 {
-    //parseFrontEncoderCounts();
+    parseFrontEncoderCounts();
     parseRearEncoderCounts();
     return 0;
 }

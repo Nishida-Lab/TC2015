@@ -7,7 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1/Links1
-        - /LaserScan1
+        - /Path1
+        - /Path1/Offset1
       Splitter Ratio: 0.5
     Tree Height: 435
   - Class: rviz/Selection
@@ -265,10 +266,10 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 25; 255; 0
+      Color: 255; 85; 255
       Enabled: true
-      Line Style: Lines
-      Line Width: 0.03
+      Line Style: Billboards
+      Line Width: 0.5
       Name: Path
       Offset:
         X: 0
@@ -294,7 +295,7 @@ Visualization Manager:
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
         Max Value: 0.75
-        Min Value: -0.162183
+        Min Value: -0.251298
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -326,6 +327,35 @@ Visualization Manager:
       Name: PoseArray
       Topic: /particlecloud
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 11.1779
+        Min Value: 0.805977
+        Value: true
+      Axis: X
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: AxisColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.01
+      Style: Flat Squares
+      Topic: /move_base/TrajectoryPlannerROS/cost_cloud
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -350,22 +380,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 31.0585
+      Distance: 8.5834
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
+        X: 2.36516
+        Y: 0.759749
         Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.785398
+      Pitch: 0.614797
       Target Frame: base_link
       Value: ThirdPersonFollower (rviz)
-      Yaw: 0.785398
+      Yaw: 1.7354
     Saved: ~
 Window Geometry:
   Displays:
@@ -383,5 +413,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 116
+  X: 75
   Y: 14
