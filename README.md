@@ -20,18 +20,23 @@
    本レポジトリを好きなディレクトリに`clone`してください。  
    - HTTP
 	 ```bash
+	 cd <catkin_ws>/src
 	 git clone https://github.com/Nishida-Lab/TC2015.git
 	 ```
 
 	- SSH
 	  ```bash
+	  cd <catkin_ws>/src
 	  git clone git@github.com:Nishida-Lab/TC2015.git
 	  ```
 
 3. `wstool`  
    ```bash
    cd <catkin_ws>
-   wstool init src src/HSR-Hackathon/.rosinstall
+   wstool init src
+   wstool merge -t src src/TC2015/third_robot/third_robot.rosinstall
+   wstool merge -t src src/TC2015/fourth_robot/fourth_robot.rosinstall
+   wstool update -t src
    ```
 
 4. `rosdep`  
