@@ -2,40 +2,40 @@
 
 ## 課題
 
-* 速度制御が不安定。突然、減速したりする。
-* 止まるのが遅い。最悪、ぶつかる。
-* 正面に突然障害物が入ると、リカバリー出来ない。バックしても切り返さず、進めない。
+[ ] 速度制御が不安定。突然、減速したりする。
+[ ] 止まるのが遅い。最悪、ぶつかる。
+[ ] 正面に突然障害物が入ると、リカバリー出来ない。バックしても切り返さず、進めない。
 
 ## `third_robot`の構成について
 
-* third_robot_2dnav
+* third_robot_2dnav  
   自律走行に必要な設定ファイルとか、ノードの起動とか。コストマップのパラメータとかもこれで設定。
   
-* third_robot_description
+* third_robot_description  
   `urdf`とか。
   
-* third_robot_driver
+* third_robot_driver  
   3号機とROSをつなぐノード。
   
-* third_robot_gmapping
+* third_robot_gmapping  
   `gmapping`をする`launch`があるだけ。
   
-* third_robot_lower_step_detector
+* third_robot_lower_step_detector  
   下に下がる段差は標準だと検知できないので、下がる場合にも反転して障害物があるように見せるノード。
   
-* third_robot_nav_goals
+* third_robot_nav_goals  
   `actionlib`を使って、ゴールの情報を`third_robot_2dnav`に送る。wayporintのセーブとかもできる。
   
-* third_robot_offset_urg
+* third_robot_offset_urg  
   今は使っていない。昔はLRFの位置のオフセットのtfを発行してた。今は`third_robot_description`が行っている。
   
-* third_robot_sound
+* third_robot_sound  
   話す言葉を生成する。
   
-* third_robot_talker
+* third_robot_talker  
   ゴールした時とかに音声を流す。`actionlib`のコールバック関数を利用。
   
-* third_robot_urg_filter
+* third_robot_urg_filter  
   LRFが普通に`inf`とかを返してくる。`inf`がくるとコストマップが反映されず、障害物情報がクリアされないので、`inf`の値は近くのレーザの値に置き換える。
   
 ## `third_robot`を使うにあたって
