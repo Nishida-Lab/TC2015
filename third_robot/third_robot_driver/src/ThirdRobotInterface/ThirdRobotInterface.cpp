@@ -167,24 +167,26 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
 {
   // Front angle in deg.
   double front_angle_deg = 0;
-  double rear_speed_m_s = 0;
-
-  if(0 <= linear_speed && linear_speed <= 0.3 && fabs(angular_speed) > 0.0)
-	{	
-	  rear_speed_m_s = 0.3;
-	  front_angle_deg = angular_speed*(180.0/M_PI);
-	}
-  else if(linear_speed <= 0.3)
+  if(linear_speed == 0.0)
+  {
+	front_angle_deg = 0;
+	// その場旋回を要求してきたら後退する。
+	if(fabs(angular_speed) > 0.0)
 	{
-	  rear_speed_m_s = linear_speed;
-	  front_angle_deg = angular_speed*(180.0/M_PI);
+	  double rear_speed_m_s = -0.5;
+	  return driveDirect(front_angle_deg, rear_speed_m_s);
 	}
+  }
   else
-	{
-	  rear_speed_m_s = 1.5;
-	  front_angle_deg = angular_speed*(180.0/M_PI);
-	}
-  
+  {
+	front_angle_deg = angular_speed*(180.0/M_PI);
+	//cout << "front_angle_deg : " << front_angle_deg << endl;
+  }
+  // Rear wheel velocity in [m/s]
+  double rear_speed_m_s = linear_speed;
+
+  //cout <<  " target_rear_speed_ms : " << rear_speed_m_s << endl;
+
   return driveDirect(front_angle_deg, rear_speed_m_s);
 }
 
@@ -316,8 +318,8 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	// front_angular	: target angle[deg];
 	// steer_angle	: now angle[deg];
 	double input_angle = 0;
-	input_angle = MAX(front_angular, -55.0);
-	input_angle = MIN(input_angle, 55.0);
+	input_angle = MAX(front_angular, -45.0);
+	input_angle = MIN(input_angle, 45.0);
 	//ROS_INFO("input angle : %lf\n", input_angle);
 
 	double angdiff = (input_angle - steer_angle);
