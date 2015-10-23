@@ -85,7 +85,7 @@ class LowerStepDetector():
 
     # default parameter values
     DEFAULT_LASER_INTENSITY_MAX = 1.5
-    DEFAULT_MARGIN_BETWEEN_PLANE_AND_DOWN_STEP = 1.5
+    DEFAULT_MARGIN_BETWEEN_PLANE_AND_DOWN_STEP = 1.0
     DEFAULT_VIRTUAL_LASER_INTENSITY = 1.0
     DEFAULT_LASER_SCAN_RANGE_DEG = 180.0
     DEFAULT_DETECT_STEP_ANGLE_MIN_DEG = 10.0
@@ -94,35 +94,35 @@ class LowerStepDetector():
 
     ## private member variables
     # original laser scan subscriber
-    __laser_ori_sub = 0
+    _laser_ori_sub = 0
     # fixed laser scan publisher
-    __laser_fix_pub = 0
-    __laser_intensity_max = 0
-    __virtual_laser_intensity = 0
-    __detect_index_min = 0
-    __detect_index_max = 0
+    _laser_fix_pub = 0
+    _laser_intensity_max = 0
+    _virtual_laser_intensity = 0
+    _detect_index_min = 0
+    _detect_index_max = 0
     #
-    __laser_scan_range_deg = 0
-    __detect_step_angle_min_deg = 0
-    __detect_step_angle_max_deg = 0
-    __detect_angle_center_deg = 0
-    __margin_between_plane_and_down_step = 0
-    __chunk_angle_for_noise_deg = 0
-    __ratio_detect_in_chunk = 0
+    _laser_scan_range_deg = 0
+    _detect_step_angle_min_deg = 0
+    _detect_step_angle_max_deg = 0
+    _detect_angle_center_deg = 0
+    _margin_between_plane_and_down_step = 0
+    _chunk_angle_for_noise_deg = 0
+    _ratio_detect_in_chunk = 0
     #
-    __is_init = True
-    __laser_scan_exs = []
+    _is_init = True
+    _laser_scan_exs = []
 
-    __count_chunk_angle = 0
-    __chunks_to_detect_noise = []
+    _count_chunk_angle = 0
+    _chunks_to_detect_noise = []
 
     ## constructor
     def __init__(self):
         rospy.init_node(NAME_NODE, anonymous=False)
         self.load_topic_name_to_sub()
         self.load_rosparam()
-        self.__laser_ori_sub = rospy.Subscriber(self.NAME_TOPIC_LASER_ORI, LaserScan, self.on_subscribe_laser_scan)
-        self.__laser_fix_pub = rospy.Publisher(self.NAME_TOPIC_LASER_FIX, LaserScan, queue_size = 1)
+        self._laser_ori_sub = rospy.Subscriber(self.NAME_TOPIC_LASER_ORI, LaserScan, self.on_subscribe_laser_scan)
+        self._laser_fix_pub = rospy.Publisher(self.NAME_TOPIC_LASER_FIX, LaserScan, queue_size = 1)
         # start callback
         rospy.spin()
 
@@ -135,22 +135,22 @@ class LowerStepDetector():
             self.NAME_TOPIC_LASER_FIX = self.NAME_TOPIC_LASER_ORI + self.NAME_TOPIC_SUFFIX_TO_PUBLISH
 
     def load_rosparam(self):
-        self.__laser_intensity_max = rospy.get_param(self.NAME_PARAM_LASER_INTENSITY, self.DEFAULT_LASER_INTENSITY_MAX)
-        self.__margin_between_plane_and_down_step = rospy.get_param(self.NAME_PARAM_MARGIN_BETWEEN_PLANE_AND_DOWN_STEP, self.DEFAULT_MARGIN_BETWEEN_PLANE_AND_DOWN_STEP)
-        self.__virtual_laser_intensity = rospy.get_param(self.NAME_PARAM_VIRTUAL_LASER_INTENSITY, self.DEFAULT_VIRTUAL_LASER_INTENSITY)
-        self.__laser_scan_range_deg = rospy.get_param(self.NAME_PARAM_LASER_SCAN_RANGE_DEG, self.DEFAULT_LASER_SCAN_RANGE_DEG)
-        self.__detect_step_angle_min_deg = rospy.get_param(self.NAME_PARAM_DETECT_STEP_ANGLE_MIN_DEG, self.DEFAULT_DETECT_STEP_ANGLE_MIN_DEG)
-        self.__detect_step_angle_max_deg = self.__laser_scan_range_deg - self.__detect_step_angle_min_deg
-        self.__detect_angle_center_deg = self.__laser_scan_range_deg / 2.0
-        self.__chunk_angle_for_noise_deg = rospy.get_param(self.NAME_PARAM_CHUNK_ANGLE_FOR_NOISE_DEG, self.DEFAULT_CHUNK_ANGLE_FOR_NOISE_DEG)
-        self.__ratio_detect_in_chunk = rospy.get_param(self.NAME_PARAM_RATIO_DETECT_IN_CHUNK, self.DEFAULT_RATIO_DETECT_IN_CHUNK)
+        self._laser_intensity_max = rospy.get_param(self.NAME_PARAM_LASER_INTENSITY, self.DEFAULT_LASER_INTENSITY_MAX)
+        self._margin_between_plane_and_down_step = rospy.get_param(self.NAME_PARAM_MARGIN_BETWEEN_PLANE_AND_DOWN_STEP, self.DEFAULT_MARGIN_BETWEEN_PLANE_AND_DOWN_STEP)
+        self._virtual_laser_intensity = rospy.get_param(self.NAME_PARAM_VIRTUAL_LASER_INTENSITY, self.DEFAULT_VIRTUAL_LASER_INTENSITY)
+        self._laser_scan_range_deg = rospy.get_param(self.NAME_PARAM_LASER_SCAN_RANGE_DEG, self.DEFAULT_LASER_SCAN_RANGE_DEG)
+        self._detect_step_angle_min_deg = rospy.get_param(self.NAME_PARAM_DETECT_STEP_ANGLE_MIN_DEG, self.DEFAULT_DETECT_STEP_ANGLE_MIN_DEG)
+        self._detect_step_angle_max_deg = self._laser_scan_range_deg - self._detect_step_angle_min_deg
+        self._detect_angle_center_deg = self._laser_scan_range_deg / 2.0
+        self._chunk_angle_for_noise_deg = rospy.get_param(self.NAME_PARAM_CHUNK_ANGLE_FOR_NOISE_DEG, self.DEFAULT_CHUNK_ANGLE_FOR_NOISE_DEG)
+        self._ratio_detect_in_chunk = rospy.get_param(self.NAME_PARAM_RATIO_DETECT_IN_CHUNK, self.DEFAULT_RATIO_DETECT_IN_CHUNK)
 
     def calculate_threshold_intensity(self, i_laser_sensor_msg_ori):
          # calculate parameters
          angle_increment = i_laser_sensor_msg_ori.angle_increment
-         self.__detect_index_min = math.radians(self.__detect_step_angle_min_deg) / angle_increment
-         self.__detect_index_max = math.radians(self.__detect_step_angle_max_deg) / angle_increment
-         detect_index_mid = math.radians(self.__detect_angle_center_deg) / angle_increment
+         self._detect_index_min = math.radians(self._detect_step_angle_min_deg) / angle_increment
+         self._detect_index_max = math.radians(self._detect_step_angle_max_deg) / angle_increment
+         detect_index_mid = math.radians(self._detect_angle_center_deg) / angle_increment
 
          for i in range(len(i_laser_sensor_msg_ori.ranges)):
              laser_scan_ex = LaserScanEx()
@@ -165,10 +165,10 @@ class LowerStepDetector():
 
              # to avoid zero division
              if theta != 0:
-                 virtual_intensity_to_ground = self.__virtual_laser_intensity / math.sin(theta)
-                 laser_intensity_thresh = (self.__laser_intensity_max  + self.__margin_between_plane_and_down_step) / math.sin(theta)
+                 virtual_intensity_to_ground = self._virtual_laser_intensity / math.sin(theta)
+                 laser_intensity_thresh = (self._laser_intensity_max  + self._margin_between_plane_and_down_step) / math.sin(theta)
              else:
-                 virtual_intensity_to_ground = self.__virtual_laser_intensity
+                 virtual_intensity_to_ground = self._virtual_laser_intensity
                  laser_intensity_thresh = float("inf")
 
              laser_scan_ex.virtual_intensity_to_ground = virtual_intensity_to_ground
@@ -177,17 +177,17 @@ class LowerStepDetector():
              laser_scan_ex.angle_laser_to_calc_intensity = theta
 
              # beyond the extend of step scan
-             if i < self.__detect_index_min or i > self.__detect_index_max:
+             if i < self._detect_index_min or i > self._detect_index_max:
                  laser_scan_ex.threshold_intensity = float("inf")
              else:
                  laser_scan_ex.threshold_intensity = laser_intensity_thresh
-             self.__laser_scan_exs.append(laser_scan_ex)
+             self._laser_scan_exs.append(laser_scan_ex)
 
     def create_angle_chunk(self, i_laser_sensor_msg_ori):
         self.calculate_threshold_intensity(i_laser_sensor_msg_ori)
 
-        if (self.__chunk_angle_for_noise_deg != 0):
-            count_chunk = round(self.__laser_scan_range_deg / self.__chunk_angle_for_noise_deg)
+        if (self._chunk_angle_for_noise_deg != 0):
+            count_chunk = round(self._laser_scan_range_deg / self._chunk_angle_for_noise_deg)
         else:
             count_chunk = 6
 
@@ -195,28 +195,28 @@ class LowerStepDetector():
 
         for j in range(int(count_chunk)):
             index_start = count_elem_chunk * j
-            chunk_angle = ChunkAngle(count_elem_chunk, index_start, self.__ratio_detect_in_chunk)
-            self.__chunks_to_detect_noise.append(chunk_angle)
+            chunk_angle = ChunkAngle(count_elem_chunk, index_start, self._ratio_detect_in_chunk)
+            self._chunks_to_detect_noise.append(chunk_angle)
 
     # first intensity judge. before analyzing intensity
     def judge_intensity(self, i_laser_sensor_msg_ori):
         for i in range(len(i_laser_sensor_msg_ori.ranges)):
             # skip when a range cannot detect down step
-            if i < self.__detect_index_min or i > self.__detect_index_max:
+            if i < self._detect_index_min or i > self._detect_index_max:
                 continue
 
             # overwrite only when range can detect down step
-            if i_laser_sensor_msg_ori.ranges[i] > self.__laser_scan_exs[i].threshold_intensity:
-                #print 'detected lower step at %f[degree]!' % self.__laser_scan_exs[i].angle_laser_deg
-                self.__laser_scan_exs[i].is_beyond_threshold_before = True
+            if i_laser_sensor_msg_ori.ranges[i] > self._laser_scan_exs[i].threshold_intensity:
+                #print 'detected lower step at %f[degree]!' % self._laser_scan_exs[i].angle_laser_deg
+                self._laser_scan_exs[i].is_beyond_threshold_before = True
             else:
-                self.__laser_scan_exs[i].is_beyond_threshold_before = False
+                self._laser_scan_exs[i].is_beyond_threshold_before = False
 
     # second intensity judge. analyzing intensity for noise detect
     def analyze_intensity_noise_detect(self, i_tmp_fix_data):
-        for j in range(len(self.__chunks_to_detect_noise)):
-            self.__chunks_to_detect_noise[j].judge_beyond_thresh(self.__laser_scan_exs)
-            self.__chunks_to_detect_noise[j].update_intensity(i_tmp_fix_data, self.__laser_scan_exs)
+        for j in range(len(self._chunks_to_detect_noise)):
+            self._chunks_to_detect_noise[j].judge_beyond_thresh(self._laser_scan_exs)
+            self._chunks_to_detect_noise[j].update_intensity(i_tmp_fix_data, self._laser_scan_exs)
 
     def on_subscribe_laser_scan(self, i_laser_sensor_msg_ori):
         laser_sensor_msg_fix = copy.deepcopy(i_laser_sensor_msg_ori)
@@ -224,9 +224,9 @@ class LowerStepDetector():
         tmp_fix_data = len(i_laser_sensor_msg_ori.ranges)*[0]
 
         # calculate threshold only when it's the first time
-        if self.__is_init == True:
+        if self._is_init == True:
             # reset initial flag
-            self.__is_init = False
+            self._is_init = False
             self.create_angle_chunk(i_laser_sensor_msg_ori)
 
         # judge laser scan data
@@ -243,7 +243,7 @@ class LowerStepDetector():
         laser_sensor_msg_fix.ranges = tuple(tmp_fix_data)
 
         # publish fixed laser scan topic
-        self.__laser_fix_pub.publish(laser_sensor_msg_fix)
+        self._laser_fix_pub.publish(laser_sensor_msg_fix)
         #print 'succeed publish'
 
 if __name__ == '__main__':
