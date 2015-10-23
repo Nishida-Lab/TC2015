@@ -14,7 +14,9 @@
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/tukutyare141110-2.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/tukutyare141110-7.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/ctrl_building.csv" /> -->
-	<param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510210032-multi-scan.csv" />
+	<!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510210032-multi-scan.csv" /> -->
+	<param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510232300-multi-scan.csv" />
+
 
 	<!-- Tukuba Kenshu Center -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/kenshu_center.csv" /> -->
