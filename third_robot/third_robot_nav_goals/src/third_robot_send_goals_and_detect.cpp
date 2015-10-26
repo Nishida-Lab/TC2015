@@ -54,16 +54,19 @@ public:
 							 ros::package::getPath("third_robot_nav_goals") 
 							 + "/waypoints/default.csv");
 		n.param("start_target_num", target_num, 0);
-		n.param("pause_waypoints", pause_waypoints_);
+		n.getParam("pause_waypoints", pause_waypoints_);
 
 		ROS_INFO("[Start target num] : %d", target_num);
+
+		num_of_pause_waypoints_ = checkPauseWaypoints(pause_waypoints_);
+		ROS_INFO("[Num of pause waypoints] : %d", num_of_pause_waypoints_);
+
 		ROS_INFO("[Waypoints file name] : %s", filename.c_str());
 
 		ROS_INFO("Reading Waypoints.");
 		if(readWaypoint(filename.c_str())){
 			ROS_ERROR("Invalid waypoints file.");
 		}
-		num_of_pause_waypoints_ = checkPauseWaypoints(pause_waypoints_);
 
 		// speeking
 		ROS_INFO("Speak request: start");
@@ -196,7 +199,7 @@ public:
 		return 0;
 	}
 
-	unsigned int checkPauseWaypoints(std::vector<int> pause_waypoints)
+	unsigned int checkPauseWaypoints(std::vector<int> &pause_waypoints)
 	{
 		unsigned int size = pause_waypoints.size();
 		if(size <= 0)
