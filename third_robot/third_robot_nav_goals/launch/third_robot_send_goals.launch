@@ -7,6 +7,8 @@
 		name="third_robot_send_goals_and_detect"
 		output="screen">
     <param name="start_target_num" value="0" />
+	<!-- <rosparam name="pause_waypoints" value="[2, 10]" /> -->
+	<rosparam param="pause_waypoints"> [2, 10]</rosparam>
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/waypoints_test2.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/monotsukuri141102.csv" /> -->
 
@@ -14,7 +16,10 @@
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/tukutyare141110-2.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/tukutyare141110-7.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/ctrl_building.csv" /> -->
-	<param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510210032-multi-scan.csv" />
+	<!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510210032-multi-scan.csv" /> -->
+	<!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510232300-multi-scan.csv" /> -->
+	<param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510240538.csv" />
+
 
 	<!-- Tukuba Kenshu Center -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/kenshu_center.csv" /> -->
