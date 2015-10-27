@@ -9,3 +9,6 @@ Session.vim
 
 # pycharm
 workspace.xml
+
+#QtCreator
+CMakeLists.txt.user
