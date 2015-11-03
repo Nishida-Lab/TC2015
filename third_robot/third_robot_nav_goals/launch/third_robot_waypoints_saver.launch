@@ -3,13 +3,13 @@
   <!-- Run the map server -->
   <node name="map_server"
   		pkg="map_server"
-  		type="map_server" args="$(find third_robot_2dnav)/map/201510240538.yaml" />
+  		type="map_server" args="$(find third_robot_2dnav)/map/201511031134.yaml" />
   
   <node pkg="third_robot_nav_goals" 
 		type="third_robot_waypoints_saver" 
 		name="third_robot_waypoints_saver"
 		output="screen">
-    <param name="savewaypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510240538.csv" />
+    <param name="savewaypointsfile" value="$(find third_robot_nav_goals)/waypoints/201511031201.csv" />
   </node>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find third_robot_nav_goals)/config/third_robot_waypoints_saver.rviz" required="true" />
