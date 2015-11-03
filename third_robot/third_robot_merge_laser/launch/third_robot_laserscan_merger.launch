@@ -8,5 +8,7 @@
 		<param name="angle_min" type="double" value="-3.14" />
 		<param name="angle_max" type="double" value="3.14" />
 		<param name="range_max" type="double" value="60.0" />
+		<param name="range_min" type="double" value="0.25" />
+
   </node>
 </launch>
