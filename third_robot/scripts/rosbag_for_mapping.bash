@@ -1,0 +1,7 @@
+if [ -e "$1" ]; then
+	rosbag record base_scan base_scan1 base_scan2 clock diagnostics hokuyo_node0/parameter_descriptions hokuyo_node0/parameter_updates hokuyo_node1/parameter_descriptions hokuyo_node1/parameter_updates hokuyo_node2/parameter_descriptions hokuyo_node2/parameter_updates joint_states laserscan_multi_merger/parameter_descriptions laserscan_multi_merger/parameter_updates merged_cloud odom rosout rosout_agg scan_multi tf -O $1	
+else
+	rosbag record base_scan base_scan1 base_scan2 clock diagnostics hokuyo_node0/parameter_descriptions hokuyo_node0/parameter_updates hokuyo_node1/parameter_descriptions hokuyo_node1/parameter_updates hokuyo_node2/parameter_descriptions hokuyo_node2/parameter_updates joint_states laserscan_multi_merger/parameter_descriptions laserscan_multi_merger/parameter_updates merged_cloud odom rosout rosout_agg scan_multi tf
+fi
+
+
