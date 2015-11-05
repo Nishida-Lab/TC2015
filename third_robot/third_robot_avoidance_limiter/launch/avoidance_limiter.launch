@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="third_robot_avoidance_limiter" 
+		type="avoidance_limiter_node" 
+		name="avoidance_limiter_node"
+		output="screen">
+	<rosparam param="no_avoidance_waypoints"> [222, 223, 224, 225, 226, 227]</rosparam>
+  </node>
+</launch>
