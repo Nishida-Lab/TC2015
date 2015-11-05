@@ -12,3 +12,4 @@ workspace.xml
 
 #QtCreator
 CMakeLists.txt.user
+/third_robot/third_robot_nav_goals/waypoints/201511042000.csv~

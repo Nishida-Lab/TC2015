@@ -8,7 +8,7 @@
 		output="screen">
     <param name="start_target_num" value="0" />
 
-	<!-- <rosparam param="pause_waypoints"> [2, 10]</rosparam> -->
+	<rosparam param="pause_waypoints"> [227]</rosparam>
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/waypoints_test2.csv" /> -->
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/monotsukuri141102.csv" /> -->
 
@@ -18,7 +18,10 @@
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/ctrl_building.csv" /> -->
 	<!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510210032-multi-scan.csv" /> -->
 	<!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201510232300-multi-scan.csv" /> -->
-	<param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201511031201.csv" />
+
+	<!-- Tsukuba Challenge 2015 -->
+	<!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201511031201.csv" /> -->
+	<param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/201511042000.csv" />
 
 
 	<!-- Tukuba Kenshu Center -->
