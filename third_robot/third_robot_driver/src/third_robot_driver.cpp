@@ -23,7 +23,7 @@ cirkit::ThirdRobotDriver::ThirdRobotDriver(ros::NodeHandle nh)
 
   odom_pub_ = nh_.advertise<nav_msgs::Odometry>("/odom", 1);
   steer_pub_ = nh_.advertise<geometry_msgs::Twist>("/steer_ctrl", 1);
-  cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(&cirkit::ThirdRobotDriver::cmdVelReceived, this, _1));
+  cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("third_robot/cmd_vel", 1, boost::bind(&cirkit::ThirdRobotDriver::cmdVelReceived, this, _1));
 }
 
 void cirkit::ThirdRobotDriver::init()
