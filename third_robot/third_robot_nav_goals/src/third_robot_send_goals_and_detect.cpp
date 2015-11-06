@@ -129,6 +129,7 @@ public:
 				stasis = NEARGOAL;
 			}
 			ROS_INFO("Reached !!! [Dist] : %lf", dist);
+			ROS_INFO("WayPoint Number is : %d", target_num);
 		}// else{
 		//   ROS_INFO("[Dist]: %lf",dist);
 		// }
