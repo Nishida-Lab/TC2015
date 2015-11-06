@@ -6,7 +6,7 @@
 		type="third_robot_send_goals_and_detect" 
 		name="third_robot_send_goals_and_detect"
 		output="screen">
-    <param name="start_target_num" value="0" />
+    <param name="start_target_num" value="224" />
 
 	<rosparam param="pause_waypoints"> [227]</rosparam>
     <!-- <param name="waypointsfile" value="$(find third_robot_nav_goals)/waypoints/waypoints_test2.csv" /> -->

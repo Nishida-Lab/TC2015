@@ -6,6 +6,11 @@ AvoidaceLimiter::AvoidaceLimiter(ros::NodeHandle nh)
   ros::NodeHandle n("~");
   n.getParam("no_avoidance_waypoints", no_avoidance_waypoints_);
 
+  for(int i = 0; i < no_avoidance_waypoints_.size(); ++i)
+	{
+	  ROS_INFO("no_avoidance_waypoints : %d", no_avoidance_waypoints_[i]);
+	}
+  
   cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(&AvoidaceLimiter::cmdVelReceived, this, _1));
   waypoint_sub_ = nh_.subscribe<std_msgs::Int32>("/waypoints_number", 1, boost::bind(&AvoidaceLimiter::waypointReceived, this, _1));
   cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("third_robot/cmd_vel",1);
@@ -35,7 +40,8 @@ void AvoidaceLimiter::cmdVelReceived(const geometry_msgs::Twist::ConstPtr& origi
 	}
   else
 	{
-	  cmd_vel_pub_.publish(*origin_cmd_vel); 
+	  cmd_vel_pub_.publish(*origin_cmd_vel);
+	  ROS_WARN("NOT Limiter !!!!!");
 	}
 }
 
