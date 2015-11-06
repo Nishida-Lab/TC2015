@@ -36,12 +36,12 @@ void AvoidaceLimiter::cmdVelReceived(const geometry_msgs::Twist::ConstPtr& origi
 		  fixed_cmd_vel.angular.z = 0;
 		}
 	  cmd_vel_pub_.publish(fixed_cmd_vel);
-	  ROS_WARN("Limiter !!!!!");
+	  // ROS_WARN("Limiter !!!!!");
 	}
   else
 	{
 	  cmd_vel_pub_.publish(*origin_cmd_vel);
-	  ROS_WARN("NOT Limiter !!!!!");
+	  // ROS_WARN("NOT Limiter !!!!!");
 	}
 }
 

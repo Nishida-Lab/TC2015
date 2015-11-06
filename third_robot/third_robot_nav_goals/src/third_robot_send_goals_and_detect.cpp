@@ -83,7 +83,7 @@ public:
 		hmn_dtct_sub = nh.subscribe<geometry_msgs::Point>("/hmn_dtct_test", 
 														  1, 
 														  boost::bind(&MyMoveBaseClient::HmndtctReceived, this, _1));
-		waypoint_pub_ = nh.advertise<std_msgs::Int32>("waypoint_number", 1);
+		waypoint_pub_ = nh.advertise<std_msgs::Int32>("/waypoints_number", 1);
 	}
 
 	void sendNewGoal()
@@ -313,7 +313,6 @@ public:
 			std_msgs::Int32 now_waypoint;
 			now_waypoint.data = target_num;
 			waypoint_pub_.publish(now_waypoint);
-
 			ros::spinOnce();
 			rate.sleep();
 		}// while(ros::ok())
