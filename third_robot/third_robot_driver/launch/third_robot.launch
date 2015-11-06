@@ -12,7 +12,7 @@
   
   <node name="rossrial_python" pkg="rosserial_python" type="serial_node.py"
 		output="screen">
-	<param name="port" value="/dev/ttyACM0" />
+	<param name="port" value="/dev/arduino_uno_95233353131351D040D0" />
   </node>
 
 </launch>
