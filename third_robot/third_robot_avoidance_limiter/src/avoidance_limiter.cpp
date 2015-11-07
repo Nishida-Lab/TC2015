@@ -31,7 +31,7 @@ void AvoidaceLimiter::cmdVelReceived(const geometry_msgs::Twist::ConstPtr& origi
 		{
 		  fixed_cmd_vel.linear.x = 0;
 		}
-	  if(fabs(fixed_cmd_vel.angular.z) > 0.5)
+	  if(fabs(fixed_cmd_vel.angular.z) > 0.1)
 		{
 		  fixed_cmd_vel.angular.z = 0;
 		}
