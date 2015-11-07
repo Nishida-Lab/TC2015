@@ -169,10 +169,10 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
   double front_angle_deg = 0;
   double rear_speed_m_s = 0;
 
-  if(0 <= linear_speed && linear_speed <= 0.3)
+  if(linear_speed <= 0.3)
 	{	
 	  rear_speed_m_s = linear_speed;
-	  front_angle_deg = angular_speed*(180.0/M_PI);
+	  front_angle_deg = 1.2*angular_speed*(180.0/M_PI);
 	}
   else if(0.3 < linear_speed && linear_speed <= 1.0)
 	{
