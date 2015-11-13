@@ -1,0 +1,15 @@
+<launch>
+  <!-- set_sim_time true -->
+  <param name="use_sim_time" value="true"/>
+
+  <include file="$(find third_robot_description)/launch/third_robot.launch">
+	<arg name="model" value="$(find third_robot_description)/urdf/third_robot.urdf"/>
+  </include>
+  
+  <arg name="map_yaml" default="$(find third_robot_2dnav)/map/201511031134.yaml"/>
+  
+  <!-- map_server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_yaml)" />
+  <!-- rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find third_robot_2dnav)/config/autorun.rviz" required="true" />
+</launch>
