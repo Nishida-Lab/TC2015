@@ -3,7 +3,7 @@
   <!-- Run the map server -->
   <node name="map_server"
   		pkg="map_server"
-  		type="map_server" args="$(find third_robot_2dnav)/map/201511042000.yaml" />
+  		type="map_server" args="$(find third_robot_2dnav)/map/201511080238.yaml" />
   
   <node pkg="third_robot_nav_goals" 
 		type="third_robot_waypoints_saver" 

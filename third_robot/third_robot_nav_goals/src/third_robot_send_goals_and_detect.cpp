@@ -23,6 +23,8 @@ read_csv.cpp : https://gist.github.com/yoneken/5765597#file-read_csv-cpp
 #include "third_robot_sound/sound_service.h"
 #include "rospeex_if/rospeex.h"
 
+#include <std_msgs/Int32.h>
+
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -81,6 +83,7 @@ public:
 		hmn_dtct_sub = nh.subscribe<geometry_msgs::Point>("/hmn_dtct_test", 
 														  1, 
 														  boost::bind(&MyMoveBaseClient::HmndtctReceived, this, _1));
+		waypoint_pub_ = nh.advertise<std_msgs::Int32>("/waypoints_number", 1);
 	}
 
 	void sendNewGoal()
@@ -126,6 +129,7 @@ public:
 				stasis = NEARGOAL;
 			}
 			ROS_INFO("Reached !!! [Dist] : %lf", dist);
+			ROS_INFO("WayPoint Number is : %d", target_num);
 		}// else{
 		//   ROS_INFO("[Dist]: %lf",dist);
 		// }
@@ -305,6 +309,10 @@ public:
 				stasis = NAVIGATING;
 				//}
 			}
+
+			std_msgs::Int32 now_waypoint;
+			now_waypoint.data = target_num;
+			waypoint_pub_.publish(now_waypoint);
 			ros::spinOnce();
 			rate.sleep();
 		}// while(ros::ok())
@@ -322,7 +330,7 @@ private:
 	ros::ServiceClient client;
 	third_robot_sound::sound_service srv;
 	ros::Subscriber hmn_dtct_sub;
-	
+  ros::Publisher waypoint_pub_;
 	boost::mutex stasis_mutex_;
 	
 	std::vector<int> detectcheck;
