@@ -169,20 +169,35 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::drive(double linear_speed, dou
   double front_angle_deg = 0;
   double rear_speed_m_s = 0;
 
-  if(0 <= linear_speed && linear_speed <= 0.3 && fabs(angular_speed) > 0.0)
+  if(-0.05 < linear_speed && linear_speed < 0.05 && fabs(angular_speed) > 0.0)
+	{
+	  rear_speed_m_s = 0.3;
+	  if(angular_speed > 0)
+		{
+		  front_angle_deg = 60;	  
+		}
+	  else
+		{
+		  front_angle_deg = -60;	  
+		}
+	}
+  else if(0 < linear_speed && linear_speed <= 0.3 && fabs(angular_speed) > 0.0)
 	{	
 	  rear_speed_m_s = 0.3;
-	  front_angle_deg = angular_speed*(180.0/M_PI);
+	  front_angle_deg = 1.8*angular_speed*(180.0/M_PI);
+	  //front_angle_deg = atan((angular_speed*1.1)/linear_speed) * (180.0/M_PI);
 	}
   else if(linear_speed <= 0.3)
 	{
 	  rear_speed_m_s = linear_speed;
-	  front_angle_deg = angular_speed*(180.0/M_PI);
+	  front_angle_deg = 1.8*angular_speed*(180.0/M_PI);
+	  //front_angle_deg = atan((angular_speed*1.1)/linear_speed) * (180.0/M_PI);
 	}
   else
 	{
 	  rear_speed_m_s = 1.5;
 	  front_angle_deg = angular_speed*(180.0/M_PI);
+	  //front_angle_deg = atan((angular_speed*1.1)/linear_speed) * (180.0/M_PI);
 	}
   
   return driveDirect(front_angle_deg, rear_speed_m_s);
@@ -264,7 +279,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 
 			writeCmd(cmd_ccmd);
 
-			if(forward_stop_cnt >= 40)
+			if(forward_stop_cnt >= 80)
 			{
 				stasis_ = ROBOT_STASIS_FORWARD_STOP;
 				forward_stop_cnt = 0;
@@ -299,7 +314,7 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 			
 			writeCmd(cmd_ccmd);
 
-			if(back_stop_cnt >= 40)
+			if(back_stop_cnt >= 100)//40)
 			{
 				stasis_ = ROBOT_STASIS_BACK_STOP;
 				back_stop_cnt = 0;
@@ -316,8 +331,8 @@ geometry_msgs::Twist cirkit::ThirdRobotInterface::driveDirect(double front_angul
 	// front_angular	: target angle[deg];
 	// steer_angle	: now angle[deg];
 	double input_angle = 0;
-	input_angle = MAX(front_angular, -55.0);
-	input_angle = MIN(input_angle, 55.0);
+	input_angle = MAX(front_angular, -60.0);
+	input_angle = MIN(input_angle, 60.0);
 	//ROS_INFO("input angle : %lf\n", input_angle);
 
 	double angdiff = (input_angle - steer_angle);
