@@ -1,0 +1,101 @@
+% si2012.sty
+% made by yoneken
+\typeout{Document Style Option `si2012.sty' <October 5, 2012>}
+
+\twocolumn
+\sloppy
+\flushbottom
+\parindent 0.7em
+\leftmargini 2em
+\leftmarginv .5em
+\leftmarginvi .5em
+
+\oddsidemargin -5.4mm
+\evensidemargin -5.4mm
+\marginparwidth 48pt 
+\marginparsep 10pt 
+\textwidth 171mm
+\textheight 250mm
+\topmargin -20mm
+\columnsep 7mm
+\parindent 1zw
+\renewcommand{\baselinestretch}{1.0} % Modify the value, if needed.
+
+\def\topfraction{0.99}
+\def\bottomfraction{0.99}
+\def\textfraction{0.01}
+\def\floatpagefraction{0.99}
+\def\dbltopfraction{0.99}
+\def\dblfloatpagefraction{0.99}
+\floatsep .5\floatsep
+\textfloatsep .5\textfloatsep
+\intextsep .5\intextsep
+\dblfloatsep .5\dblfloatsep
+\dbltextfloatsep .5\dbltextfloatsep
+\abovecaptionskip 0pt
+
+\def\title#1{\gdef\@title{#1}}
+\def\engtitle#1{\gdef\@engtitle{#1}}
+\def\author#1{\gdef\@author{#1}}
+\def\engauthor#1{\gdef\@engauthor{#1}}
+\def\@maketitle{\newpage
+  \null
+  \vskip 1.5em
+  \begin{center}%
+    {\LARGE\bf \@title}%
+    \vskip 1.2em
+    {\large \@author}%
+    \vskip 1.2em
+    {\Large \@engtitle}%
+    \vskip 1.2em
+    {\large \@engauthor}%
+  \end{center}
+  \vskip 1em
+  \@ifundefined{@abstract}{}{%
+    \small
+    \begin{center}%
+      \begin{minipage}{.9\textwidth}%
+        {Abstract:}\@abstract
+      \end{minipage}%
+    \end{center}%
+    \gdef\@abstract{}}
+  %\vspace*{2em}
+  \vskip 1.8em
+  }
+\long\def\abstract#1{\long\gdef\@abstract{#1}}
+
+% 章番号の後にドットを挿入する
+\def\thesection{\arabic{section}.}
+\def\thesubsection{\arabic{section}.\arabic{subsection}}
+
+% 図番，表番は，Fig.??, Table ??の形式
+\def\fnum@figure{Fig.~\thefigure}
+\def\fnum@table{Table~\thetable}
+
+% 章，節タイトルのフォーマット
+\def\section{\@startsection {section}{1}{\z@}%
+  {.8ex plus .5ex minus .2ex}{.5ex plus .2ex}{\large\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}%
+  {.8ex plus .5ex minus .2ex}{.5ex plus .2ex}{\normalsize\bf}}
+  %{.8ex}{.5ex}{\fontsize{11pt}{.5ex}\selectfont\bf}}
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+  {.8ex plus .5ex minus .2ex}{.5ex plus .2ex}{\normalsize\bf}}
+\def\paragraph{\@startsection {paragraph}{4}{\z@}%
+  {0.5ex plus .3ex minus .2ex}{-1em}{\normalsize\bf}}
+\def\subparagraph{\@startsection {subparagraph}{4}{\parindent}%
+  {0.5ex plus .3ex minus .2ex}{-1em}{\normalsize\bf}}
+
+% 参考文献のリスト番号を [1] の形式にする．
+\def\thebibliography#1{\section*{参考文献\markboth
+ {参 考 文 献}{参 考 文 献}}\list
+ {[{\arabic{enumi}}]}{\settowidth\labelwidth{[{#1}]}\leftmargin\labelwidth
+ \advance\leftmargin\labelsep
+ \usecounter{enumi}}
+ \def\newblock{\hskip .11em plus .33em minus .07em}
+ \sloppy
+ \sfcode`\.=1000\relax}
+\let\endthebibliography=\endlist
+
+% 引用は [1] 形式の上付きにする．
+\def\@cite#1#2{$^{[\hbox{\scriptsize{#1\if@tempswa , #2\fi}}]}$}
+
