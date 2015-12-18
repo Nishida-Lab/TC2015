@@ -13,3 +13,8 @@ workspace.xml
 #QtCreator
 CMakeLists.txt.user
 /third_robot/third_robot_nav_goals/waypoints/201511042000.csv~
+/Document/Report/tc2015_report.aux
+/Document/Report/tc2015_report.dvi
+/Document/Report/tc2015_report.fdb_latexmk
+/Document/Report/tc2015_report.log
+/Document/Report/tc2015_report.synctex.gz
